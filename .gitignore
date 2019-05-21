@@ -1,3 +1,7 @@
 /.vscode/
 *.pdf
 /.DS_Store/
+*.tar
+*.exe
+*.bin
+*.ipch

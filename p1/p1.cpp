@@ -10,7 +10,7 @@ int main()
         try
         {
             cin >> n >> type;
-            if (n > 10000000 || n < -10000000)
+            if (n > 10000000 || n < 0)
                 throw n;
             if (type < 1 || type > 4)
                 throw type;
