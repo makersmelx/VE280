@@ -85,7 +85,10 @@ int test_four(int n)
             i_count++;
         }
         if (i_count >= 2)
-            frac_count++;
+        {
+            string i_num = to_string(i_count);
+            frac_count += i_num.length();
+        }
     }
     if (digit < frac_count)
         return 1;
