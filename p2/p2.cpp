@@ -160,7 +160,7 @@ static int max_helper(tree_t tree, int max)
 
 int tree_max(tree_t tree)
 {	
-	return (tree_isEmpty(tree)) ? INT_MAX : max_helper(tree, tree_elt(tree));
+	return max_helper(tree, tree_elt(tree));
 }
 
 static void traversal_helper(tree_t tree, list_t &res) // make to list_t return
@@ -219,7 +219,7 @@ bool tree_allPathSumGreater(tree_t tree, int sum)
 bool covered_by(tree_t A, tree_t B)
 {
 	if (tree_isEmpty(A))
-		return tree_isEmpty(B);
+		return !tree_isEmpty(B);
 	else if (tree_isEmpty(B))
 		return false;
 	return tree_elt(A) == tree_elt(B) && covered_by(tree_left(A), tree_left(B)) && covered_by(tree_right(A), tree_right(B));
@@ -230,7 +230,7 @@ static bool subtree(tree_t A, tree_t B,bool flag)
 	if (tree_isEmpty(B))
 		return false;
 	if (flag)
-		return (tree_elt(A) == tree_elt(B)) ? subtree(tree_left(A), tree_left(B), flag) && subtree(tree_right(A), tree_right(B), flag) : false;
+		return tree_elt(A) == tree_elt(B) && subtree(tree_left(A), tree_left(B), flag) && subtree(tree_right(A), tree_right(B), flag);
 	else
 	{
 		if (tree_elt(A) == tree_elt(B))
