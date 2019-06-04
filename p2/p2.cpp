@@ -78,7 +78,6 @@ list_t unique(list_t list)
 	return reverse(unique_helper(list, list_make()));
 }
 
-
 list_t insert_list(list_t first, list_t second, unsigned int n)
 {
 	return append(chop(first, size(first) - n), append(second, chop(first, n)));
