@@ -1,15 +1,11 @@
 #ifndef SIMULATION_H
 #define SIMULATION_H
 
-#include<string>
 #include "world_type.h"
+#include <string>
 
-static void split(string & str, string * res, string & pattern);
+static void split(string &str, string *res, string &pattern);
 //Spilt a string according to certain pattern
-//checked
-
-static terrain_t terr_dict(char t);
-//translate capital input into terrain_t
 //checked
 
 static unsigned int initialize_creature(world_t &world, ifstream &file, species_t *speciesList); //Error 3, Error 13, Error 14
@@ -42,7 +38,7 @@ struct species_t *all_species(string *sp_list);
 //checked
 point_t forward(point_t &loc, direction_t &d);
 
-bool out_of_boudary(point_t &loc,grid_t &g);
+bool out_of_boudary(point_t &loc, grid_t &g);
 
 bool hop_helper(grid_t &g, point_t &loc, creature_t &c); //true means can do
 
@@ -50,13 +46,13 @@ bool ifwall_helper(grid_t &g, point_t &loc, creature_t &c); //true means is a wa
 
 void infect(creature_t &c, point_t &loc, grid_t &g);
 
-void action(creature_t &c, instruction_t *ins, grid_t &g, int count,bool v);
+void action(creature_t &c, instruction_t *ins, grid_t &g, int count, bool v);
 
 void print_round(int round);
 
 void print_world(world_t &w);
 
-void take_round(world_t &w, int now,bool verb);
+void take_round(world_t &w, int now, bool verb);
 
 // void pos_change(world_t &w, creature_t cr, int dest_r, int dest_c);
 // //respond on grid_t of the world, the pos_change of creature.

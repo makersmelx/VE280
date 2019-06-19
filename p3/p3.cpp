@@ -2,16 +2,17 @@
 #include "world_type.h"
 #include <cassert>
 #include <iostream>
+#include <sstream>
 #include <string>
 int main(int argc, char **argv)
 {
-    if (argc < 4) //Error 1
+    if (argc < 3) //Error 1
     {
-        std::cout << "Error: Missiong arguments!" << endl;
+        std::cout << "Error: Missing arguments!" << endl;
         std::cout << "Usage: ./p3 <specices-summary> <world-file> <rounds> [v|verbose]" << endl;
         assert(0);
     }
-    if (atoi(argv[3]) < 0)
+    if (argv[2] - '0' < 0)
     {
         std::cout << "Error: Number of Simulation rounds is negative!" << endl;
         assert(0);
@@ -23,14 +24,18 @@ int main(int argc, char **argv)
     struct world_t world;
     initialize_world(world, argv[2], species);
 
-    int round = atoi(argv[3]);
+    string _round = argv[3];
+    stringstream ss;
+    ss << _round;
+    int round;
+    ss >> round;
 
     bool verbose = false;
-    if (argc == 5)
-        if (argv[4][0] == 'v')
+    if (argc == 4)
+        if (argv[3][0] == 'v')
             verbose = true;
 
-    take_round(world, round,verbose);
+    take_round(world, round, verbose);
     //work part
     //output part? do this with debug?
 }
