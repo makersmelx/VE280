@@ -4,19 +4,31 @@
 #include "world_type.h"
 #include <string>
 
-static void split(string &str, string *res, string &pattern);
+struct string_error
+{
+    string val;
+    int type;
+};
+
+struct int_error
+{
+    int val;
+    int type;
+};
+
+void split(string &str, string *res, string &pattern);
 //Spilt a string according to certain pattern
 //checked
 
-static unsigned int initialize_creature(world_t &world, ifstream &file, species_t *speciesList); //Error 3, Error 13, Error 14
+unsigned int initialize_creature(world_t &world, ifstream &file, species_t *speciesList); //Error 3, Error 13, Error 14
 //initialize creature_t related attribute of world_t
 //return creature numbers
 
-static void initialize_grid(grid_t &g, ifstream &file);
+void initialize_grid(grid_t &g, ifstream &file);
 //initialize grid_t related attribute of world_t
 //checked
 
-static void initialize_species(world_t &w);
+void initialize_species(world_t &w);
 //initialize species_t related attribute of world_t
 
 void initialize_world(world_t &w, char *filename, species_t *species); //Error 3 ,Error 7, Error 8, Error 9
@@ -25,11 +37,11 @@ void initialize_world(world_t &w, char *filename, species_t *species); //Error 3
 void read_summary(string *list, string filename);
 //read from "species"
 
-static string *read_raw_instruction(string dir, string name);
+string *read_raw_instruction(string dir, string name);
 //return an array of string, each item stands for one line of raw file content, including comments
 //checked
 
-static struct instruction_t readable_instruct(string raw);
+struct instruction_t readable_instruct(string raw);
 //translate the raw string into instruction_t
 //checked
 
@@ -41,8 +53,6 @@ point_t forward(point_t &loc, direction_t &d);
 bool out_of_boudary(point_t &loc, grid_t &g);
 
 bool hop_helper(grid_t &g, point_t &loc, creature_t &c); //true means can do
-
-bool ifwall_helper(grid_t &g, point_t &loc, creature_t &c); //true means is a wall
 
 void infect(creature_t &c, point_t &loc, grid_t &g);
 

@@ -1,5 +1,4 @@
 #include "simulation.h"
-#include <cassert>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -7,8 +6,8 @@
 //#include "pch.h"
 using namespace std;
 
-static void split(string &str,
-				  string *res, string &pattern)
+void split(string &str,
+		   string *res, string &pattern)
 {
 	string::size_type pos;
 	str += pattern;
@@ -17,9 +16,9 @@ static void split(string &str,
 	for (int i = 0; i < size; i++)
 	{
 		pos = str.find(pattern, i);
-		if (pos < size)
+		if (int(pos) < size)
 		{
-			if (i != pos)
+			if (i != int(pos))
 			{
 				string s = str.substr(i, pos - i);
 				res[index] = s;
@@ -31,13 +30,13 @@ static void split(string &str,
 }
 
 // //Not debugged
-static unsigned int initialize_creature(world_t &world, ifstream &file, species_t *speciesList) //Error 3, Error 13, Error 14
+unsigned int initialize_creature(world_t &world, ifstream &file, species_t *speciesList) //Error 3, Error 13, Error 14
 {
 	unsigned int itr = 0;
 	if (!file.is_open())
 	{
 		cout << "File not open!" << endl;
-		assert(0);
+		exit(0);
 	}
 	else
 	{
@@ -69,8 +68,9 @@ static unsigned int initialize_creature(world_t &world, ifstream &file, species_
 			if (!flag)
 			{
 				cout << "Error: Species " << argus[0] << " not found!" << endl;
-				assert(0);
+				exit(0);
 			}
+			//direction setting
 			for (int i = 0; i < 4; i++)
 			{
 				if (directName[i] == argus[1])
@@ -82,27 +82,27 @@ static unsigned int initialize_creature(world_t &world, ifstream &file, species_
 				{
 					cout << "Error: Direction"
 						 << " " << argus[1] << " is not recognized!" << endl;
-					assert(0);
+					exit(0);
 				}
 			}
+			//location setting
 			c[itr].location.r = stoi(argus[2]);
 			c[itr].location.c = stoi(argus[3]);
 			if (c[itr].location.r > h - 1 || c[itr].location.c > w - 1)
 			{
 				cout << "Error: Creature (" << argus[0] << " " << argus[1] << " " << argus[2] << " " << argus[3] << ") ";
 				cout << "is out of bound!" << endl;
-				cout << "The grid size is " << h << "-" << w << "." << endl;
-				assert(0);
+				cout << "The grid size is " << h << "-by-" << w << "." << endl;
+				exit(0);
 			}
-			//needs rewrite as is dynamic
-			for (int i = 0; i < itr; i++)
+			for (unsigned int i = 0; i < itr; i++)
 			{
 				if (c[i].location.r == c[itr].location.r && c[i].location.c == c[itr].location.c)
 				{
-					cout << "Error: Creature (" << c[i].species->name << " " << directName[c[i].direction] << " " << c[i].location.r << " " << c[i].location.c << ") ";
+					cout << "Error: Creature (" << c[itr].species->name << " " << directName[c[itr].direction] << " " << c[itr].location.r << " " << c[itr].location.c << ") ";
 					cout << "overlaps with ";
-					cout << "creature (" << c[itr].species->name << " " << directName[c[itr].direction] << " " << c[itr].location.r << " " << c[itr].location.c << ")!" << endl;
-					assert(0);
+					cout << "creature (" << c[i].species->name << " " << directName[c[i].direction] << " " << c[i].location.r << " " << c[i].location.c << ")!" << endl;
+					exit(0);
 				}
 			}
 			c[itr].programID = 0;
@@ -113,7 +113,7 @@ static unsigned int initialize_creature(world_t &world, ifstream &file, species_
 	return itr;
 }
 
-static void initialize_grid(grid_t &g, ifstream &file) // ok on base that file is valid
+void initialize_grid(grid_t &g, ifstream &file) // ok on base that file is valid
 {
 	string tmp;
 	getline(file, tmp);
@@ -121,35 +121,34 @@ static void initialize_grid(grid_t &g, ifstream &file) // ok on base that file i
 	if (g.height > MAXHEIGHT)
 	{
 		cout << "Error: The grid height is illegal!" << endl;
-		assert(0);
+		exit(0);
 	}
 	getline(file, tmp);
 	g.width = stoi(tmp);
 	if (g.width > MAXWIDTH)
 	{
 		cout << "Error: The grid width is illegal!" << endl;
-		assert(0);
+		exit(0);
 	}
 
-	for (int i = 0; i < g.height; i++)
-		for (int j = 0; j < g.width; j++)
+	for (unsigned int i = 0; i < g.height; i++)
+		for (unsigned int j = 0; j < g.width; j++)
 			g.squares[i][j] = NULL;
 }
 
-static void initialize_species(world_t &w)
+void initialize_species(world_t &w)
 {
 	w.numSpecies = 0;
-	for (int i = 0; i < w.numCreatures; i++)
+	for (unsigned int i = 0; i < w.numCreatures; i++)
 	{
 		if (i == 0)
 		{
 			w.species[0] = *(w.creatures[0].species);
 			w.numSpecies++;
 		}
-
 		else
 		{
-			for (int j = 0; j < i; j++)
+			for (unsigned int j = 0; j < i; j++)
 			{
 				if (w.creatures[i].species->name == w.creatures[j].species->name)
 					break;
@@ -161,6 +160,12 @@ static void initialize_species(world_t &w)
 			}
 		}
 	}
+	if (w.numSpecies > MAXSPECIES)
+	{
+		cout << "Error: Too many species!" << endl;
+		cout << "Maximal number of species is " << MAXSPECIES << "." << endl;
+		exit(0);
+	}
 }
 
 void initialize_world(world_t &w, char *filename, species_t *species) //Error 3 ,Error 7, Error 8, Error 9
@@ -170,7 +175,7 @@ void initialize_world(world_t &w, char *filename, species_t *species) //Error 3 
 	if (!file.is_open())
 	{
 		cout << "Error: Cannot open file " << filename << endl;
-		assert(0);
+		exit(0);
 	}
 	initialize_grid((w.grid), file);
 	w.numCreatures = initialize_creature(w, file, species);
@@ -194,12 +199,12 @@ void read_summary(string *list, string filename) //Error 3
 	else
 	{
 		cout << "Error: Cannot open file " << filename << endl;
-		assert(0);
+		exit(0);
 	}
 }
 
 // 0 should change to read all instrcutions //should return string arrays, each item for one line //line numbers needed
-static string *read_raw_instruction(string dir, string name) //including Error 3
+string *read_raw_instruction(string dir, string name) //including Error 3
 {
 	string *res = new string[MAXPROGRAM];
 	string path = "./" + dir + "/" + name;
@@ -216,13 +221,13 @@ static string *read_raw_instruction(string dir, string name) //including Error 3
 	}
 	else
 	{
-		cout << "Error: Cannot open file " << dir << "/" << name << "." << endl;
-		assert(0);
+		cout << "Error: Cannot open file " << dir << "/" << name << "!" << endl;
+		exit(0);
 	}
 	return res;
 }
 
-static struct instruction_t readable_instruct(string raw) //Error 6
+struct instruction_t readable_instruct(string raw) //Error 6
 {
 	struct instruction_t res;
 	istringstream is;
@@ -247,7 +252,7 @@ static struct instruction_t readable_instruct(string raw) //Error 6
 		if (i == 8)
 		{
 			cout << "Error: Instruction " + op + " is not recognized." << endl;
-			assert(0);
+			exit(0);
 		}
 	}
 	return res;
@@ -281,22 +286,47 @@ point_t forward(point_t &loc, direction_t &d)
 
 bool out_of_boudary(point_t &loc, grid_t &g)
 {
-	return (loc.r > (g.height - 1) || loc.r < 0 || loc.c < 0 || loc.c > (g.width - 1)) ? true : false;
+	return (loc.r > int(g.height - 1) || loc.r < 0 || loc.c < 0 || loc.c > int(g.width - 1)) ? true : false;
 }
 
 bool hop_helper(grid_t &g, point_t &loc, creature_t &c) //true means can do
 {
-	return (out_of_boudary(loc, g) || ((g.terrain[loc.r][loc.c] == 1) && !c.ability[0]) || (g.squares[loc.r][loc.c] != NULL)) ? false : true;
+	return (out_of_boudary(loc, g) || (g.squares[loc.r][loc.c] != NULL)) ? false : true;
 }
 
-bool ifwall_helper(grid_t &g, point_t &loc, creature_t &c) //true means is a wall
+void hop(creature_t &c, grid_t &g)
 {
-	return (out_of_boudary(loc, g) || ((g.terrain[loc.r][loc.c] == 1) && !c.ability[0])) ? true : false;
+	point_t tmp_0 = forward(c.location, c.direction);
+	if (hop_helper(g, tmp_0, c))
+	{
+		g.squares[c.location.r][c.location.c] = NULL;
+		c.location.r = tmp_0.r;
+		c.location.c = tmp_0.c;
+		g.squares[c.location.r][c.location.c] = &c;
+	}
+}
+
+void left(creature_t &c)
+{
+	int i = c.direction;
+	if (i > 0)
+		c.direction = (enum direction_t)(i - 1);
+	else
+		c.direction = (enum direction_t)3;
+}
+
+void right(creature_t &c)
+{
+	int i = c.direction;
+	if (i < 3)
+		c.direction = (enum direction_t)(i + 1);
+	else
+		c.direction = (enum direction_t)0;
 }
 
 void infect(creature_t &c, point_t &loc, grid_t &g)
 {
-	if (out_of_boudary(loc, g) || (g.terrain[loc.r][loc.c] == 2 && !c.ability[1]) || g.squares[loc.r][loc.c] == NULL || g.squares[loc.r][loc.c]->species->name == c.species->name)
+	if (out_of_boudary(loc, g) || g.squares[loc.r][loc.c] == NULL || g.squares[loc.r][loc.c]->species->name == c.species->name)
 		return;
 	else
 	{
@@ -309,11 +339,7 @@ void action(creature_t &c, instruction_t *ins, grid_t &g, int count, bool v)
 //count starts from 0  count means the now stream
 //return the next instruction to do
 {
-	if (c.hillActive && g.terrain[c.location.r][c.location.c] == 3)
-	{
-		c.hillActive = false;
-		return;
-	}
+	//verbose console part
 	if (v)
 	{
 		cout << "Instruction " << count + 1 << ": " << opName[ins[count].op];
@@ -344,7 +370,7 @@ void action(creature_t &c, instruction_t *ins, grid_t &g, int count, bool v)
 	else if (ins[count].op == 5)
 	{
 		point_t tmp_5 = forward(c.location, c.direction);
-		if (!out_of_boudary(tmp_5, g) && (c.ability[1] || g.terrain[tmp_5.r][tmp_5.c] != 2) && g.squares[tmp_5.r][tmp_5.c] != NULL && g.squares[tmp_5.r][tmp_5.c]->species->name != c.species->name)
+		if (!out_of_boudary(tmp_5, g) && g.squares[tmp_5.r][tmp_5.c] != NULL && g.squares[tmp_5.r][tmp_5.c]->species->name != c.species->name)
 		{
 			action(c, ins, g, ins[count].address - 1, v);
 			return;
@@ -358,7 +384,7 @@ void action(creature_t &c, instruction_t *ins, grid_t &g, int count, bool v)
 	else if (ins[count].op == 6)
 	{
 		point_t tmp_6 = forward(c.location, c.direction);
-		if (!out_of_boudary(tmp_6, g) && g.squares[tmp_6.r][tmp_6.c] != NULL && g.terrain[tmp_6.r][tmp_6.c] != 2 && g.squares[tmp_6.r][tmp_6.c]->species->name == c.species->name)
+		if (!out_of_boudary(tmp_6, g) && g.squares[tmp_6.r][tmp_6.c] != NULL && g.squares[tmp_6.r][tmp_6.c]->species->name == c.species->name)
 		{
 			action(c, ins, g, ins[count].address - 1, v);
 			return;
@@ -372,7 +398,7 @@ void action(creature_t &c, instruction_t *ins, grid_t &g, int count, bool v)
 	else if (ins[count].op == 7)
 	{
 		point_t tmp_7 = forward(c.location, c.direction);
-		if (ifwall_helper(g, tmp_7, c))
+		if (out_of_boudary(tmp_7, g))
 		{
 			action(c, ins, g, ins[count].address - 1, v);
 			return;
@@ -385,47 +411,22 @@ void action(creature_t &c, instruction_t *ins, grid_t &g, int count, bool v)
 	}
 	else if (ins[count].op == 0)
 	{
-		point_t tmp_0 = forward(c.location, c.direction);
-		if (hop_helper(g, tmp_0, c))
-		{
-			g.squares[c.location.r][c.location.c] = NULL;
-			c.location.r = tmp_0.r;
-			c.location.c = tmp_0.c;
-			g.squares[c.location.r][c.location.c] = &c;
-		}
+		hop(c, g);
 	}
 	else if (ins[count].op == 1)
 	{
-		int i = c.direction;
-		if (i > 0)
-			c.direction = (enum direction_t)(i - 1);
-		else
-			c.direction = (enum direction_t)3;
+		left(c);
 	}
 	else if (ins[count].op == 2)
 	{
-		int i = c.direction;
-		if (i < 3)
-			c.direction = (enum direction_t)(i + 1);
-		else
-			c.direction = (enum direction_t)0;
+		right(c);
 	}
 	else if (ins[count].op == 3) //infect
 	{
 		point_t tmp_3 = forward(c.location, c.direction);
-		if (c.ability[1])
-		{
-			while (out_of_boudary(tmp_3, g))
-			{
-				infect(c, tmp_3, g);
-				tmp_3 = forward(tmp_3, c.direction);
-			}
-		}
-		else
-		{
-			infect(c, tmp_3, g); //bookmark
-		}
+		infect(c, tmp_3, g); //bookmark
 	}
+
 	if (!v)
 		cout << " " << opName[ins[count].op] << endl;
 	c.programID = count + 1;
@@ -441,9 +442,9 @@ void print_round(int round)
 
 void print_world(world_t &w)
 {
-	for (int i = 0; i < w.grid.height; i++)
+	for (unsigned int i = 0; i < w.grid.height; i++)
 	{
-		for (int j = 0; j < w.grid.width; j++)
+		for (unsigned int j = 0; j < w.grid.width; j++)
 		{
 			if (w.grid.squares[i][j] == NULL)
 				cout << "____"
@@ -464,7 +465,7 @@ void take_round(world_t &w, int roundLeft, bool verb)
 	while (roundLeft > 0)
 	{
 		print_round(max - roundLeft + 1);
-		for (int i = 0; i < w.numCreatures; i++)
+		for (unsigned int i = 0; i < w.numCreatures; i++)
 		{
 			creature_t &target = w.creatures[i];
 			cout << "Creature "
