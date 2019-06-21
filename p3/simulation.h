@@ -4,17 +4,6 @@
 #include "world_type.h"
 #include <string>
 
-struct string_error
-{
-    string val;
-    int type;
-};
-
-struct int_error
-{
-    int val;
-    int type;
-};
 
 void split(string &str, string *res, string &pattern);
 //Spilt a string according to certain pattern

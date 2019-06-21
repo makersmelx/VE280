@@ -110,6 +110,11 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 			itr++;
 		}
 	}
+	if(itr > MAXCREATURES)
+	{
+		cout << "Error: Too many creatures!" << endl;
+		cout << "Maximal number of creatures is " << MAXCREATURES << endl;
+	}
 	return itr;
 }
 
@@ -235,9 +240,9 @@ struct instruction_t readable_instruct(string raw) //Error 6
 	string op;
 	is >> op;
 	if (op.compare("infect") == 0 ||
-		op.compare("hop") == 0 ||
-		op.compare("right") == 0 ||
-		op.compare("left") == 0)
+			op.compare("hop") == 0 ||
+			op.compare("right") == 0 ||
+			op.compare("left") == 0)
 		res.address = 0;
 	else
 		is >> res.address;
@@ -251,7 +256,7 @@ struct instruction_t readable_instruct(string raw) //Error 6
 		}
 		if (i == 8)
 		{
-			cout << "Error: Instruction " + op + " is not recognized." << endl;
+			cout << "Error: Instruction " + op + " is not recognized!" << endl;
 			exit(0);
 		}
 	}
@@ -272,6 +277,12 @@ struct species_t *all_species(string *sp_list)
 		{
 			s[index].program[i] = readable_instruct(res[i]);
 			i++;
+		}
+		if(i > MAXPROGRAM)
+		{
+			cout << "Error: Too many instructions for species " << s[index].name << "!" << endl;
+			cout << "Maximal number of instructions is " << MAXPROGRAM << "." << endl;
+			exit(0);
 		}
 		s[index].programSize = i;
 		index++;
@@ -347,86 +358,100 @@ void action(creature_t &c, instruction_t *ins, grid_t &g, int count, bool v)
 			cout << " " << ins[count].address;
 		cout << endl;
 	}
-
-	if (ins[count].op == 8)
+	switch (ins[count].op)
 	{
-		action(c, ins, g, ins[count].address - 1, v);
-		return;
+	case 0:
+	{
+		hop(c, g);
+		break;
 	}
-	else if (ins[count].op == 4)
+		
+	case 1:
+	{
+		left(c);
+		break;
+	}
+		
+	case 2:
+	{
+		right(c);
+		break;
+	}
+		
+	case 3:
+	{
+		point_t tmp_3 = forward(c.location, c.direction);
+		infect(c, tmp_3, g);
+		break;
+	}
+		
+	case 4:
 	{
 		point_t tmp_4 = forward(c.location, c.direction);
 		if (!out_of_boudary(tmp_4, g) && g.squares[tmp_4.r][tmp_4.c] == NULL)
 		{
 			action(c, ins, g, ins[count].address - 1, v);
-			return;
 		}
 		else
 		{
 			action(c, ins, g, count + 1, v);
-			return;
 		}
+		return;
 	}
-	else if (ins[count].op == 5)
+		
+
+	case 5:
 	{
 		point_t tmp_5 = forward(c.location, c.direction);
 		if (!out_of_boudary(tmp_5, g) && g.squares[tmp_5.r][tmp_5.c] != NULL && g.squares[tmp_5.r][tmp_5.c]->species->name != c.species->name)
 		{
 			action(c, ins, g, ins[count].address - 1, v);
-			return;
 		}
 		else
 		{
 			action(c, ins, g, count + 1, v);
-			return;
 		}
+		return;
 	}
-	else if (ins[count].op == 6)
+
+	case 6:
 	{
 		point_t tmp_6 = forward(c.location, c.direction);
 		if (!out_of_boudary(tmp_6, g) && g.squares[tmp_6.r][tmp_6.c] != NULL && g.squares[tmp_6.r][tmp_6.c]->species->name == c.species->name)
 		{
 			action(c, ins, g, ins[count].address - 1, v);
-			return;
 		}
 		else
 		{
 			action(c, ins, g, count + 1, v);
-			return;
 		}
+		return;
 	}
-	else if (ins[count].op == 7)
-	{
-		point_t tmp_7 = forward(c.location, c.direction);
+		
+
+	case 7:
+		{
+			point_t tmp_7 = forward(c.location, c.direction);
 		if (out_of_boudary(tmp_7, g))
 		{
 			action(c, ins, g, ins[count].address - 1, v);
-			return;
 		}
 		else
 		{
 			action(c, ins, g, count + 1, v);
-			return;
 		}
-	}
-	else if (ins[count].op == 0)
-	{
-		hop(c, g);
-	}
-	else if (ins[count].op == 1)
-	{
-		left(c);
-	}
-	else if (ins[count].op == 2)
-	{
-		right(c);
-	}
-	else if (ins[count].op == 3) //infect
-	{
-		point_t tmp_3 = forward(c.location, c.direction);
-		infect(c, tmp_3, g); //bookmark
+		return;
+		}
+
+	case 8:
+		action(c, ins, g, ins[count].address - 1, v);
+		return;
+
+	default:
+		break;
 	}
 
+	
 	if (!v)
 		cout << " " << opName[ins[count].op] << endl;
 	c.programID = count + 1;
@@ -457,7 +482,6 @@ void print_world(world_t &w)
 }
 
 void take_round(world_t &w, int roundLeft, bool verb)
-//now strats from 1
 {
 	int max = roundLeft;
 	print_round(max - roundLeft);

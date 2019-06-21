@@ -20,13 +20,6 @@ int main(int argc, char **argv)
         assert(0);
     }
 
-    std::string dir_species[MAXSPECIES + 1];
-    read_summary(dir_species, argv[1]);
-    species_t *species = all_species(dir_species);
-
-    struct world_t world;
-    initialize_world(world, argv[2], species);
-
     bool verbose = false;
     if (argc == 5)
     {
@@ -35,20 +28,16 @@ int main(int argc, char **argv)
             verbose = true;
     }
 
-    try
-    {
-        take_round(world, round, verbose);
-    }
-    catch (string_error &e)
-    {
-        switch (e.type)
-        {
-        case 3:
-            cout << "Error: Cannot open file " << e.val << endl;
-            break;
-        }
-    }
+    std::string dir_species[MAXSPECIES + 1];
+    struct world_t world;
+
+    read_summary(dir_species, argv[1]);
+    species_t *species = all_species(dir_species);
+
+    initialize_world(world, argv[2], species);
+
+    take_round(world, round, verbose);
+    
 
     //work part
-    //output part? do this with debug?
 }
