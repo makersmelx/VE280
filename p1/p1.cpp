@@ -98,12 +98,12 @@ int test_four(int n)
 
 int main()
 {
-    int n, type;
+    int n = 0, type = 0;
     while (true)
     {
         cout << "Please enter the integer and the test number: ";
         cin >> n >> type;
-        if (n > 10000000 || n < 0)
+        if (n > 10000000 || n <= 0)
             continue;
         if (type < 1 || type > 4)
             continue;
@@ -126,4 +126,5 @@ int main()
     {
         cout << test_four(n);
     }
+    return 0;
 }
