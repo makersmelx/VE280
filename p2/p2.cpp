@@ -10,13 +10,11 @@ int size(list_t list)
 
 bool memberOf(list_t list, int val)
 {
-	
 	return list_isEmpty(list)?false: ((list_first(list) == val) || memberOf(list_rest(list), val));
 }
 
 int dot(list_t v1, list_t v2)
 {
-	
 	return (list_isEmpty(v1) || list_isEmpty(v2))?0 : (list_first(v1) * list_first(v2) + dot(list_rest(v1), list_rest(v2)));
 }
 
@@ -27,7 +25,7 @@ bool isIncreasing(list_t v)
 
 static list_t reverse_helper(list_t list, list_t res)
 {
-	return (size(list) == 0)? res : reverse_helper(list_rest(list),list_make(list_first(list), res));
+	return (list_isEmpty(list))? res : reverse_helper(list_rest(list),list_make(list_first(list), res));
 }
 
 list_t reverse(list_t list)
@@ -52,20 +50,17 @@ static int arith_helper(list_t v)//ensure that has at least two elems
 
 bool isArithmeticSequence(list_t v)
 {
-	
 	return size(v) <= 2 || (arith_helper(v) == arith_helper(list_rest(v)) && isArithmeticSequence(list_rest(v)));
 }
 
-
-
 list_t filter_odd(list_t list)
 {
-	return list_isEmpty(list)?list_make() : (list_first(list) % 2 == 1) ? list_make(list_first(list),filter_odd(list_rest(list))):filter_odd(list_rest(list));
+	return list_isEmpty(list)? list_make() : (list_first(list) % 2 == 1 ? list_make(list_first(list),filter_odd(list_rest(list))):filter_odd(list_rest(list)) );
 }
 
 list_t filter(list_t list, bool(*fn)(int))
 {
-	return list_isEmpty(list)?list_make() : fn(list_first(list)) ? list_make(list_first(list),filter(list_rest(list),fn)):filter(list_rest(list),fn);
+	return list_isEmpty(list)?list_make() : (fn(list_first(list)) ? list_make(list_first(list),filter(list_rest(list),fn)):filter(list_rest(list),fn));
 }
 
 static list_t unique_helper(list_t list, list_t res)
@@ -80,7 +75,7 @@ list_t unique(list_t list)
 
 list_t insert_list(list_t first, list_t second, unsigned int n)
 {
-	return append(chop(first, size(first) - n), append(second, chop(first, n)));
+	return append(chop(first, size(first) - n), append(second, reverse(chop(reverse(first),n))));
 }
 
 list_t chop(list_t list, unsigned int n)
@@ -119,14 +114,10 @@ int depth(tree_t tree)
 	return (tree_isEmpty(tree)) ? 0 : maxium(depth(tree_left(tree)), depth(tree_right(tree))) + 1;
 }
 
-static int max_helper(tree_t tree, int max)
-{
-	return (tree_isEmpty(tree)) ? max : maxium(maxium(max_helper(tree_left(tree), max), max_helper(tree_right(tree), max)), tree_elt(tree));
-}
 
 int tree_max(tree_t tree)
 {	
-	return tree_isEmpty(tree)? INT32_MIN: max_helper(tree, tree_elt(tree));
+	return tree_isEmpty(tree)? INT32_MIN: maxium(maxium(tree_max(tree_left(tree)), tree_max(tree_right(tree))), tree_elt(tree));
 }
 
 list_t traversal(tree_t tree)
@@ -168,37 +159,10 @@ bool covered_by(tree_t A, tree_t B)
 	return tree_elt(A) == tree_elt(B) && covered_by(tree_left(A), tree_left(B)) && covered_by(tree_right(A), tree_right(B));
 }
 
-static bool tree_equal(tree_t t1, tree_t t2)
-    // EFFECTS: returns true iff t1 == t2
-{
-    if(tree_isEmpty(t1) && tree_isEmpty(t2))
-    {
-        return true;
-    }
-    else if(tree_isEmpty(t1) || tree_isEmpty(t2))
-    {
-        return false;
-    }
-    else
-    {
-        return ((tree_elt(t1) == tree_elt(t2)) 
-            && tree_equal(tree_left(t1), tree_left(t2))
-            && tree_equal(tree_right(t1), tree_right(t2)));
-    }
-}
-
-static bool subtree(tree_t A, tree_t B)
-{
-	if (tree_isEmpty(B))
-		return tree_isEmpty(A)?true:false;
-	if (tree_elt(A) == tree_elt(B))
-		return tree_equal(A,B);
-	return subtree(A, tree_left(B)) || subtree(A, tree_right(B));
-}
 
 bool contained_by(tree_t A, tree_t B)
 {
-	return (covered_by(A, B)) || subtree(A, B);
+	return covered_by(A, B) ||( !tree_isEmpty(B) && (covered_by(A, tree_left(B)) || (covered_by(A, tree_right(B)))));
 }
 
 tree_t insert_tree(int elt, tree_t tree)
