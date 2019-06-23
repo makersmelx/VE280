@@ -6,6 +6,143 @@
 //#include "pch.h"
 using namespace std;
 
+worldError::worldError(int type, int val)
+{
+	errType = type;
+	errVal[0] = val;
+}
+
+worldError::worldError(int type, string msg)
+{
+	errType = type;
+	errMsg[0] = msg;
+}
+
+worldError::worldError(int type, string *msg)
+{
+	errType = type;
+	int i = 0;
+	while (!msg[i].empty())
+	{
+		errMsg[i] = msg[i];
+		i++;
+	}
+}
+
+worldError::worldError(int type, int *val, int valLen, string *msg)
+{
+	errType = type;
+	int i = 0;
+	while (!msg[i].empty())
+	{
+		errMsg[i] = msg[i];
+		i++;
+	}
+	i = 0;
+	while (i < valLen)
+	{
+		errVal[i] = val[i];
+		i++;
+	}
+}
+
+worldError::worldError(int type, int len, creature_t **cr)
+{
+	for (int i = 0; i < len; i++)
+	{
+		errCr[i] = cr[i];
+	}
+}
+
+void worldError::printError()
+{
+	switch (errType)
+	{
+	case 1:
+	{
+		std::cout << "Error: Missing arguments!" << endl;
+		std::cout << "Usage: ./p3 <specices-summary> <world-file> <rounds> [v|verbose]" << endl;
+		break;
+	}
+	case 2:
+	{
+		std::cout << "Error: Number of Simulation rounds is negative!" << endl;
+		break;
+	}
+	case 3:
+	{
+		cout << "Error: Cannot open file " << errMsg[0] << "!" << endl;
+		break;
+	}
+	case -3: // dir/file situation
+	{
+		cout << "Error: Cannot open file " << errMsg[0]
+			 << "/" << errMsg[1] << "!" << endl;
+		break;
+	}
+	case 4:
+	{
+		cout << "Error: Too many species!" << endl;
+		cout << "Maximal number of species is " << MAXSPECIES << "." << endl;
+	}
+	case 5:
+	{
+		cout << "Error: Too many instructions for species "
+			 << errMsg[0] << "!" << endl;
+		cout << "Maximal number of instructions is " << MAXPROGRAM << "." << endl;
+		break;
+	}
+	case 6:
+	{
+		cout << "Error: Instruction " << errMsg[0] << " is not recognized!" << endl;
+		break;
+	}
+	case 7:
+	{
+		cout << "Error: Too many creatures!" << endl;
+		cout << "Maximal number of creatures is " << MAXCREATURES << endl;
+		break;
+	}
+	case 8:
+	{
+		cout << "Error: Species " << errMsg[0] << " not found!" << endl;
+		break;
+	}
+	case 9:
+	{
+		cout << "Error: Direction"
+			 << " " << errMsg[0] << " is not recognized!" << endl;
+		break;
+	}
+	case 10:
+	{
+		cout << "Error: The grid height is illegal!" << endl;
+		break;
+	}
+	case 11:
+	{
+		cout << "Error: The grid width is illegal!" << endl;
+		break;
+	}
+	case 12:
+	{
+		cout << "Error: Creature (" << errMsg[0] << " " << errMsg[1] << " " << errMsg[2] << " " << errMsg[3] << ") ";
+		cout << "is out of bound!" << endl;
+		cout << "The grid size is " << errVal[0] << "-by-" << errVal[1] << "." << endl;
+	}
+	case 13:
+	{
+		cout << "Error: Creature (" << errCr[0]->species->name << " " << directName[errCr[0]->direction] << " " << errCr[0]->location.r << " " << errCr[0]->location.c << ") ";
+		cout << "overlaps with ";
+		cout << "creature (" << errCr[1]->species->name << " " << directName[errCr[1]->direction] << " " << errCr[1]->location.r << " " << errCr[1]->location.c << ")!" << endl;
+		exit(0);
+	}
+	default:
+		break;
+	}
+	exit(0);
+}
+
 void split(string &str,
 		   string *res, string &pattern)
 {
@@ -60,8 +197,7 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 		}
 		if (!flag)
 		{
-			cout << "Error: Species " << argv[0] << " not found!" << endl;
-			exit(0);
+			worldError(8, argv[0]).printError();
 		}
 		//direction setting
 		for (int i = 0; i < 4; i++)
@@ -73,9 +209,7 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 			}
 			if (i == 3)
 			{
-				cout << "Error: Direction"
-					 << " " << argv[1] << " is not recognized!" << endl;
-				exit(0);
+				worldError(8, argv[1]).printError();
 			}
 		}
 		//location setting
@@ -83,19 +217,16 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 		c[creature_num].location.c = stoi(argv[3]);
 		if (c[creature_num].location.r > h - 1 || c[creature_num].location.c > w - 1)
 		{
-			cout << "Error: Creature (" << argv[0] << " " << argv[1] << " " << argv[2] << " " << argv[3] << ") ";
-			cout << "is out of bound!" << endl;
-			cout << "The grid size is " << h << "-by-" << w << "." << endl;
-			exit(0);
+			string err[4] = {argv[0], argv[1], argv[2], argv[3]};
+			int erri[2] = {h, w};
+			worldError(12, erri, 2, err).printError();
 		}
 		for (unsigned int i = 0; i < creature_num; i++)
 		{
 			if (c[i].location.r == c[creature_num].location.r && c[i].location.c == c[creature_num].location.c)
 			{
-				cout << "Error: Creature (" << c[creature_num].species->name << " " << directName[c[creature_num].direction] << " " << c[creature_num].location.r << " " << c[creature_num].location.c << ") ";
-				cout << "overlaps with ";
-				cout << "creature (" << c[i].species->name << " " << directName[c[i].direction] << " " << c[i].location.r << " " << c[i].location.c << ")!" << endl;
-				exit(0);
+				creature_t *err[2] = {c+creature_num,c+i};
+				throw worldError(13, 2, err);
 			}
 		}
 		c[creature_num].programID = 0;
@@ -105,9 +236,7 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 
 	if (creature_num > MAXCREATURES)
 	{
-		cout << "Error: Too many creatures!" << endl;
-		cout << "Maximal number of creatures is " << MAXCREATURES << endl;
-		exit(0);
+		worldError(7, 0).printError();
 	}
 	return creature_num;
 }
@@ -117,17 +246,15 @@ void initialize_grid(grid_t &g, ifstream &file) // ok on base that file is valid
 	string tmp;
 	getline(file, tmp);
 	g.height = stoi(tmp);
-	if (g.height > MAXHEIGHT)
+	if (g.height > MAXHEIGHT || g.height < 1)
 	{
-		cout << "Error: The grid height is illegal!" << endl;
-		exit(0);
+		worldError(10, 0).printError();
 	}
 	getline(file, tmp);
 	g.width = stoi(tmp);
-	if (g.width > MAXWIDTH)
+	if (g.width > MAXWIDTH || g.width < 1)
 	{
-		cout << "Error: The grid width is illegal!" << endl;
-		exit(0);
+		worldError(11, 0).printError();
 	}
 
 	for (unsigned int i = 0; i < g.height; i++)
@@ -161,9 +288,7 @@ void initialize_species(world_t &w)
 	}
 	if (w.numSpecies > MAXSPECIES)
 	{
-		cout << "Error: Too many species!" << endl;
-		cout << "Maximal number of species is " << MAXSPECIES << "." << endl;
-		exit(0);
+		worldError(4, 0).printError();
 	}
 }
 
@@ -173,8 +298,7 @@ void initialize_world(world_t &w, char *filename, species_t *species) //Error 3 
 	ifstream file(filename);
 	if (!file.is_open())
 	{
-		cout << "Error: Cannot open file " << filename << "!" << endl;
-		exit(0);
+		worldError(3, filename).printError();
 	}
 	initialize_grid((w.grid), file);
 	w.numCreatures = initialize_creature(w, file, species);
@@ -197,8 +321,7 @@ void read_summary(string *list, string filename) //Error 3
 	}
 	else
 	{
-		cout << "Error: Cannot open file " << filename << "!" << endl;
-		exit(0);
+		worldError(3, filename).printError();
 	}
 }
 
@@ -220,7 +343,8 @@ string *read_raw_instruction(string dir, string name) //including Error 3
 	}
 	else
 	{
-		cout << "Error: Cannot open file " << dir << "/" << name << "!" << endl;
+		string err[2] = {dir, name};
+		worldError(-3, err).printError();
 		exit(0);
 	}
 	return res;
@@ -250,8 +374,7 @@ struct instruction_t readable_instruct(string raw) //Error 6
 		}
 		if (i == 8)
 		{
-			cout << "Error: Instruction " + op + " is not recognized!" << endl;
-			exit(0);
+			worldError(6, op).printError();
 		}
 	}
 	return res;
@@ -261,25 +384,23 @@ struct instruction_t readable_instruct(string raw) //Error 6
 struct species_t *all_species(string *sp_list)
 {
 	species_t *s = new species_t[MAXSPECIES];
-	int index = 0;
-	while (!sp_list[index + 1].empty())
+	int current_sp = 0;
+	while (!sp_list[current_sp + 1].empty())
 	{
-		s[index].name = sp_list[index + 1];
-		string *res = read_raw_instruction(sp_list[0], sp_list[index + 1]);
-		int i = 0;
+		s[current_sp].name = sp_list[current_sp + 1];
+		string *res = read_raw_instruction(sp_list[0], sp_list[current_sp + 1]);
+		int i = 0; //instruction iterator
 		while (!res[i].empty())
 		{
-			s[index].program[i] = readable_instruct(res[i]);
+			s[current_sp].program[i] = readable_instruct(res[i]);
 			i++;
 		}
 		if (i > int(MAXPROGRAM))
 		{
-			cout << "Error: Too many instructions for species " << s[index].name << "!" << endl;
-			cout << "Maximal number of instructions is " << MAXPROGRAM << "." << endl;
-			exit(0);
+			worldError(5, s[current_sp].name).printError();
 		}
-		s[index].programSize = i;
-		index++;
+		s[current_sp].programSize = i;
+		current_sp++;
 	}
 	return s;
 }

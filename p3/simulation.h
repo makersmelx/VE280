@@ -4,6 +4,23 @@
 #include "world_type.h"
 #include <string>
 
+class worldError
+{
+public:
+    worldError(int type, int val);
+    worldError(int type, string *msg);
+    worldError(int type, int *val, int valLen, string *msg);
+    worldError(int type, string msg);
+    worldError(int type, int len, creature_t **cr);
+    void printError();
+
+private:
+    int errVal[2];
+    string errMsg[4];
+    creature_t *errCr[2];
+    int errType;
+};
+
 void split(string &str, string *res, string &pattern);
 //Spilt a string according to certain pattern
 //checked
@@ -57,10 +74,11 @@ void infect(creature_t &c, point_t &loc, grid_t &g);
 //doing the process of infect
 
 void action(creature_t &c, instruction_t *ins, grid_t &g, int count, bool v);
-//
+//execute the next instruction in the program list of one certain species
+//count stands for the current program to execute
 
 void print_round(int round);
-//print the current round as part of output during each round
+//print the first line of the current round (Round n) during each round
 
 void print_world(world_t &w);
 //print the m*n world with creature information during each round
