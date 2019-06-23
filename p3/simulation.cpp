@@ -32,27 +32,27 @@ void split(string &str,
 // //Not debugged
 unsigned int initialize_creature(world_t &world, ifstream &file, species_t *speciesList) //Error 3, Error 13, Error 14
 {
-	unsigned int itr = 0;
+	unsigned int creature_num = 0;
 	creature_t *c = world.creatures;
 	int h = world.grid.height;
 	int w = world.grid.width;
-	string tmp;
-	string argus[50];
+	string creature_tmp;
+	string argv[50];
 	string pattern = " ";
 	while (file)
 	{
-		getline(file, tmp);
-		if (tmp.empty())
+		getline(file, creature_tmp);
+		if (creature_tmp.empty())
 			break;
-		split(tmp, argus, pattern);
-
+		split(creature_tmp, argv, pattern);
+		//define the species of the current creature
 		int index = 0;
 		bool flag = false;
 		while (!speciesList[index].name.empty())
 		{
-			if (speciesList[index].name == argus[0])
+			if (speciesList[index].name == argv[0])
 			{
-				c[itr].species = speciesList + index;
+				c[creature_num].species = speciesList + index;
 				flag = true;
 				break;
 			}
@@ -60,56 +60,56 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 		}
 		if (!flag)
 		{
-			cout << "Error: Species " << argus[0] << " not found!" << endl;
+			cout << "Error: Species " << argv[0] << " not found!" << endl;
 			exit(0);
 		}
 		//direction setting
 		for (int i = 0; i < 4; i++)
 		{
-			if (directName[i] == argus[1])
+			if (directName[i] == argv[1])
 			{
-				c[itr].direction = (enum direction_t)i;
+				c[creature_num].direction = (enum direction_t)i;
 				break;
 			}
 			if (i == 3)
 			{
 				cout << "Error: Direction"
-					 << " " << argus[1] << " is not recognized!" << endl;
+					 << " " << argv[1] << " is not recognized!" << endl;
 				exit(0);
 			}
 		}
 		//location setting
-		c[itr].location.r = stoi(argus[2]);
-		c[itr].location.c = stoi(argus[3]);
-		if (c[itr].location.r > h - 1 || c[itr].location.c > w - 1)
+		c[creature_num].location.r = stoi(argv[2]);
+		c[creature_num].location.c = stoi(argv[3]);
+		if (c[creature_num].location.r > h - 1 || c[creature_num].location.c > w - 1)
 		{
-			cout << "Error: Creature (" << argus[0] << " " << argus[1] << " " << argus[2] << " " << argus[3] << ") ";
+			cout << "Error: Creature (" << argv[0] << " " << argv[1] << " " << argv[2] << " " << argv[3] << ") ";
 			cout << "is out of bound!" << endl;
 			cout << "The grid size is " << h << "-by-" << w << "." << endl;
 			exit(0);
 		}
-		for (unsigned int i = 0; i < itr; i++)
+		for (unsigned int i = 0; i < creature_num; i++)
 		{
-			if (c[i].location.r == c[itr].location.r && c[i].location.c == c[itr].location.c)
+			if (c[i].location.r == c[creature_num].location.r && c[i].location.c == c[creature_num].location.c)
 			{
-				cout << "Error: Creature (" << c[itr].species->name << " " << directName[c[itr].direction] << " " << c[itr].location.r << " " << c[itr].location.c << ") ";
+				cout << "Error: Creature (" << c[creature_num].species->name << " " << directName[c[creature_num].direction] << " " << c[creature_num].location.r << " " << c[creature_num].location.c << ") ";
 				cout << "overlaps with ";
 				cout << "creature (" << c[i].species->name << " " << directName[c[i].direction] << " " << c[i].location.r << " " << c[i].location.c << ")!" << endl;
 				exit(0);
 			}
 		}
-		c[itr].programID = 0;
-		world.grid.squares[c[itr].location.r][c[itr].location.c] = &c[itr];
-		itr++;
+		c[creature_num].programID = 0;
+		world.grid.squares[c[creature_num].location.r][c[creature_num].location.c] = &c[creature_num];
+		creature_num++;
 	}
 
-	if (itr > MAXCREATURES)
+	if (creature_num > MAXCREATURES)
 	{
 		cout << "Error: Too many creatures!" << endl;
 		cout << "Maximal number of creatures is " << MAXCREATURES << endl;
 		exit(0);
 	}
-	return itr;
+	return creature_num;
 }
 
 void initialize_grid(grid_t &g, ifstream &file) // ok on base that file is valid
@@ -342,7 +342,6 @@ void infect(creature_t &c, point_t &loc, grid_t &g)
 
 void action(creature_t &c, instruction_t *ins, grid_t &g, int count, bool v)
 //count starts from 0  count means the now stream
-//return the next instruction to do
 {
 	//verbose console part
 	if (v)
