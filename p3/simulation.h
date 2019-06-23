@@ -3,27 +3,27 @@
 
 #include "world_type.h"
 #include <string>
-
+//exception class
 class worldError
 {
 public:
     worldError(int type, int val);
-    worldError(int type, string *msg);
-    worldError(int type, int *val, int valLen, string *msg);
+    worldError(int type, string *msg,int strLen);
+    worldError(int type, int *val, int valLen, string *msg,int strLen);
     worldError(int type, string msg);
     worldError(int type, int len, creature_t **cr);
     void printError();
+    //output error message
 
 private:
-    int errVal[2];
-    string errMsg[4];
+    int errVal[10];
+    string errMsg[10];
     creature_t *errCr[2];
     int errType;
 };
 
 void split(string &str, string *res, string &pattern);
 //Spilt a string according to certain pattern
-//checked
 
 unsigned int initialize_creature(world_t &world, ifstream &file, species_t *speciesList); //Error 3, Error 13, Error 14
 //initialize creature_t related attribute of world_t
@@ -38,7 +38,7 @@ void initialize_species(world_t &w);
 void initialize_world(world_t &w, char *filename, species_t *species);
 //generate world_t from reading world file, the main function
 
-void read_summary(string *list, string filename);
+void read_file_species(string *list, string filename);
 //read from the file "species", store the raw data in the array of string "list"
 
 string *read_raw_instruction(string dir, string name);
@@ -48,7 +48,7 @@ struct instruction_t readable_instruct(string raw);
 //translate the raw data of instruction into instruction_t
 
 struct species_t *all_species(string *sp_list);
-//interpretate commands from all the creature files, collect all the instruction for one species, then collect all the species
+//interpretate commands from the species files, collect all the instruction for one species, then collect all the species
 //return the list of all species loaded
 
 point_t forward(point_t &loc, direction_t &d);

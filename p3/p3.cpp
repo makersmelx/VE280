@@ -30,7 +30,7 @@ int main(int argc, char **argv)
         std::string dir_species[MAXSPECIES + 1];
         struct world_t world;
 
-        read_summary(dir_species, argv[1]);
+        read_file_species(dir_species, argv[1]);
         species_t *species = all_species(dir_species);
 
         initialize_world(world, argv[2], species);

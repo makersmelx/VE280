@@ -18,22 +18,22 @@ worldError::worldError(int type, string msg)
 	errMsg[0] = msg;
 }
 
-worldError::worldError(int type, string *msg)
+worldError::worldError(int type, string *msg,int strLen)
 {
 	errType = type;
 	int i = 0;
-	while (!msg[i].empty())
+	while (i < strLen)
 	{
 		errMsg[i] = msg[i];
 		i++;
 	}
 }
 
-worldError::worldError(int type, int *val, int valLen, string *msg)
+worldError::worldError(int type, int *val, int valLen, string *msg,int strLen)
 {
 	errType = type;
 	int i = 0;
-	while (!msg[i].empty())
+	while (i < strLen)
 	{
 		errMsg[i] = msg[i];
 		i++;
@@ -48,6 +48,7 @@ worldError::worldError(int type, int *val, int valLen, string *msg)
 
 worldError::worldError(int type, int len, creature_t **cr)
 {
+	errType = type;
 	for (int i = 0; i < len; i++)
 	{
 		errCr[i] = cr[i];
@@ -60,8 +61,8 @@ void worldError::printError()
 	{
 	case 1:
 	{
-		std::cout << "Error: Missing arguments!" << endl;
-		std::cout << "Usage: ./p3 <specices-summary> <world-file> <rounds> [v|verbose]" << endl;
+		cout << "Error: Missing arguments!" << endl;
+		cout << "Usage: ./p3 <specices-summary> <world-file> <rounds> [v|verbose]" << endl;
 		break;
 	}
 	case 2:
@@ -129,13 +130,14 @@ void worldError::printError()
 		cout << "Error: Creature (" << errMsg[0] << " " << errMsg[1] << " " << errMsg[2] << " " << errMsg[3] << ") ";
 		cout << "is out of bound!" << endl;
 		cout << "The grid size is " << errVal[0] << "-by-" << errVal[1] << "." << endl;
+		break;
 	}
 	case 13:
 	{
 		cout << "Error: Creature (" << errCr[0]->species->name << " " << directName[errCr[0]->direction] << " " << errCr[0]->location.r << " " << errCr[0]->location.c << ") ";
 		cout << "overlaps with ";
 		cout << "creature (" << errCr[1]->species->name << " " << directName[errCr[1]->direction] << " " << errCr[1]->location.r << " " << errCr[1]->location.c << ")!" << endl;
-		exit(0);
+		break;
 	}
 	default:
 		break;
@@ -197,7 +199,7 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 		}
 		if (!flag)
 		{
-			worldError(8, argv[0]).printError();
+			throw worldError(8, argv[0]);
 		}
 		//direction setting
 		for (int i = 0; i < 4; i++)
@@ -209,7 +211,7 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 			}
 			if (i == 3)
 			{
-				worldError(8, argv[1]).printError();
+				throw worldError(8, argv[1]);
 			}
 		}
 		//location setting
@@ -219,7 +221,7 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 		{
 			string err[4] = {argv[0], argv[1], argv[2], argv[3]};
 			int erri[2] = {h, w};
-			worldError(12, erri, 2, err).printError();
+			throw worldError(12, erri, 2, err,4);
 		}
 		for (unsigned int i = 0; i < creature_num; i++)
 		{
@@ -236,7 +238,7 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 
 	if (creature_num > MAXCREATURES)
 	{
-		worldError(7, 0).printError();
+		throw worldError(7, 0);
 	}
 	return creature_num;
 }
@@ -248,13 +250,13 @@ void initialize_grid(grid_t &g, ifstream &file) // ok on base that file is valid
 	g.height = stoi(tmp);
 	if (g.height > MAXHEIGHT || g.height < 1)
 	{
-		worldError(10, 0).printError();
+		throw worldError(10, 0);
 	}
 	getline(file, tmp);
 	g.width = stoi(tmp);
 	if (g.width > MAXWIDTH || g.width < 1)
 	{
-		worldError(11, 0).printError();
+		throw worldError(11, 0);
 	}
 
 	for (unsigned int i = 0; i < g.height; i++)
@@ -288,7 +290,7 @@ void initialize_species(world_t &w)
 	}
 	if (w.numSpecies > MAXSPECIES)
 	{
-		worldError(4, 0).printError();
+		throw worldError(4, 0);
 	}
 }
 
@@ -298,7 +300,7 @@ void initialize_world(world_t &w, char *filename, species_t *species) //Error 3 
 	ifstream file(filename);
 	if (!file.is_open())
 	{
-		worldError(3, filename).printError();
+		throw worldError(3, filename);
 	}
 	initialize_grid((w.grid), file);
 	w.numCreatures = initialize_creature(w, file, species);
@@ -306,7 +308,7 @@ void initialize_world(world_t &w, char *filename, species_t *species) //Error 3 
 	file.close();
 }
 
-void read_summary(string *list, string filename) //Error 3
+void read_file_species(string *list, string filename) //Error 3
 {
 	ifstream file(filename);
 	if (file.is_open())
@@ -321,7 +323,7 @@ void read_summary(string *list, string filename) //Error 3
 	}
 	else
 	{
-		worldError(3, filename).printError();
+		throw worldError(3, filename);
 	}
 }
 
@@ -344,7 +346,7 @@ string *read_raw_instruction(string dir, string name) //including Error 3
 	else
 	{
 		string err[2] = {dir, name};
-		worldError(-3, err).printError();
+		throw worldError(-3, err,2);
 		exit(0);
 	}
 	return res;
@@ -374,7 +376,7 @@ struct instruction_t readable_instruct(string raw) //Error 6
 		}
 		if (i == 8)
 		{
-			worldError(6, op).printError();
+			throw worldError(6, op);
 		}
 	}
 	return res;
@@ -397,7 +399,7 @@ struct species_t *all_species(string *sp_list)
 		}
 		if (i > int(MAXPROGRAM))
 		{
-			worldError(5, s[current_sp].name).printError();
+			throw worldError(5, s[current_sp].name);
 		}
 		s[current_sp].programSize = i;
 		current_sp++;
