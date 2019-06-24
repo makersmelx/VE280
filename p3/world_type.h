@@ -5,14 +5,13 @@
 
 using namespace std;
 
-const unsigned int MAXSPECIES = 10; // Max number of species in the
-                                    // world
-const unsigned int MAXPROGRAM = 40; // Max size of a species program
+const unsigned int MAXSPECIES = 10;   // Max number of species in the
+                                      // world
+const unsigned int MAXPROGRAM = 40;   // Max size of a species program
 const unsigned int MAXCREATURES = 50; // Max number of creatures in
                                       // the world
-const unsigned int MAXHEIGHT = 20; // Max height of the grid
-const unsigned int MAXWIDTH = 20;  // Max width of the grid
-
+const unsigned int MAXHEIGHT = 20;    // Max height of the grid
+const unsigned int MAXWIDTH = 20;     // Max width of the grid
 
 struct point_t
 {
@@ -27,7 +26,13 @@ struct point_t
 // c corresponds to the column number.
 */
 
-enum direction_t { EAST, SOUTH, WEST, NORTH };
+enum direction_t
+{
+    EAST,
+    SOUTH,
+    WEST,
+    NORTH
+};
 /*
 // Type: direction_t
 // ----------------
@@ -41,8 +46,18 @@ const string directName[] = {"east", "south", "west", "north"};
 const string directShortName[] = {"e", "s", "w", "n"};
 // An array of strings representing the direction short name.
 
-enum opcode_t {HOP, LEFT, RIGHT, INFECT, IFEMPTY, IFENEMY,
-    IFSAME, IFWALL, GO };
+enum opcode_t
+{
+    HOP,
+    LEFT,
+    RIGHT,
+    INFECT,
+    IFEMPTY,
+    IFENEMY,
+    IFSAME,
+    IFWALL,
+    GO
+};
 /*
 // Type: opcode_t
 // -------------
@@ -51,7 +66,7 @@ enum opcode_t {HOP, LEFT, RIGHT, INFECT, IFEMPTY, IFENEMY,
 */
 
 const string opName[] = {"hop", "left", "right", "infect",
-    "ifempty", "ifenemy", "ifsame", "ifwall", "go"};
+                         "ifempty", "ifenemy", "ifsame", "ifwall", "go"};
 // An array of strings representing the command name.
 
 struct instruction_t

@@ -18,7 +18,7 @@ worldError::worldError(int type, string msg)
 	errMsg[0] = msg;
 }
 
-worldError::worldError(int type, string *msg,int strLen)
+worldError::worldError(int type, string *msg, int strLen)
 {
 	errType = type;
 	int i = 0;
@@ -29,7 +29,7 @@ worldError::worldError(int type, string *msg,int strLen)
 	}
 }
 
-worldError::worldError(int type, int *val, int valLen, string *msg,int strLen)
+worldError::worldError(int type, int *val, int valLen, string *msg, int strLen)
 {
 	errType = type;
 	int i = 0;
@@ -85,6 +85,7 @@ void worldError::printError()
 	{
 		cout << "Error: Too many species!" << endl;
 		cout << "Maximal number of species is " << MAXSPECIES << "." << endl;
+		break;
 	}
 	case 5:
 	{
@@ -168,8 +169,7 @@ void split(string &str,
 	}
 }
 
-// //Not debugged
-unsigned int initialize_creature(world_t &world, ifstream &file, species_t *speciesList) //Error 3, Error 13, Error 14
+unsigned int initialize_creature(world_t &world, ifstream &file, species_t *speciesList)
 {
 	unsigned int creature_num = 0;
 	creature_t *c = world.creatures;
@@ -183,6 +183,11 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 		getline(file, creature_tmp);
 		if (creature_tmp.empty())
 			break;
+		if (creature_num >= MAXCREATURES)
+		{
+			throw worldError(7, 0);
+		}
+
 		split(creature_tmp, argv, pattern);
 		//define the species of the current creature
 		int index = 0;
@@ -211,7 +216,7 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 			}
 			if (i == 3)
 			{
-				throw worldError(8, argv[1]);
+				throw worldError(9, argv[1]);
 			}
 		}
 		//location setting
@@ -221,13 +226,13 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 		{
 			string err[4] = {argv[0], argv[1], argv[2], argv[3]};
 			int erri[2] = {h, w};
-			throw worldError(12, erri, 2, err,4);
+			throw worldError(12, erri, 2, err, 4);
 		}
 		for (unsigned int i = 0; i < creature_num; i++)
 		{
 			if (c[i].location.r == c[creature_num].location.r && c[i].location.c == c[creature_num].location.c)
 			{
-				creature_t *err[2] = {c+creature_num,c+i};
+				creature_t *err[2] = {c + creature_num, c + i};
 				throw worldError(13, 2, err);
 			}
 		}
@@ -236,10 +241,6 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 		creature_num++;
 	}
 
-	if (creature_num > MAXCREATURES)
-	{
-		throw worldError(7, 0);
-	}
 	return creature_num;
 }
 
@@ -294,7 +295,7 @@ void initialize_species(world_t &w)
 	}
 }
 
-void initialize_world(world_t &w, char *filename, species_t *species) //Error 3 ,Error 7, Error 8, Error 9
+void initialize_world(world_t &w, char *filename, species_t *species)
 {
 	//*****************************
 	ifstream file(filename);
@@ -308,7 +309,7 @@ void initialize_world(world_t &w, char *filename, species_t *species) //Error 3 
 	file.close();
 }
 
-void read_file_species(string *list, string filename) //Error 3
+void read_file_species(string *list, string filename)
 {
 	ifstream file(filename);
 	if (file.is_open())
@@ -316,6 +317,10 @@ void read_file_species(string *list, string filename) //Error 3
 		int i = 0;
 		while (file)
 		{
+			if (i - 1 > int(MAXSPECIES))
+			{
+				throw worldError(4, 0);
+			}
 			getline(file, list[i]);
 			i++;
 		}
@@ -327,8 +332,7 @@ void read_file_species(string *list, string filename) //Error 3
 	}
 }
 
-// 0 should change to read all instrcutions //should return string arrays, each item for one line //line numbers needed
-string *read_raw_instruction(string dir, string name) //including Error 3
+string *read_raw_instruction(string dir, string name)
 {
 	string *res = new string[MAXPROGRAM];
 	string path = "./" + dir + "/" + name;
@@ -336,9 +340,16 @@ string *read_raw_instruction(string dir, string name) //including Error 3
 	int itr = 0;
 	if (file.is_open())
 	{
-		while (file) //the down content may not be ignored, needed debugged
+		while (file)
 		{
+			if (itr > int(MAXPROGRAM))
+			{
+				throw worldError(5, name);
+			}
 			getline(file, res[itr]);
+			//IGNORE COMMENTS BELOW
+			if (res[itr].empty())
+				break;
 			itr++;
 		}
 		file.close();
@@ -346,13 +357,13 @@ string *read_raw_instruction(string dir, string name) //including Error 3
 	else
 	{
 		string err[2] = {dir, name};
-		throw worldError(-3, err,2);
+		throw worldError(-3, err, 2);
 		exit(0);
 	}
 	return res;
 }
 
-struct instruction_t readable_instruct(string raw) //Error 6
+struct instruction_t readable_instruct(string raw)
 {
 	struct instruction_t res;
 	istringstream is;
@@ -382,7 +393,6 @@ struct instruction_t readable_instruct(string raw) //Error 6
 	return res;
 }
 
-//1 read all presetted instructions (done
 struct species_t *all_species(string *sp_list)
 {
 	species_t *s = new species_t[MAXSPECIES];
@@ -396,10 +406,6 @@ struct species_t *all_species(string *sp_list)
 		{
 			s[current_sp].program[i] = readable_instruct(res[i]);
 			i++;
-		}
-		if (i > int(MAXPROGRAM))
-		{
-			throw worldError(5, s[current_sp].name);
 		}
 		s[current_sp].programSize = i;
 		current_sp++;
