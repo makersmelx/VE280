@@ -1,5 +1,5 @@
-#ifndef SIMULATION_H
-#define SIMULATION_H
+#ifndef _SIMULATION_H
+#define _SIMULATION_H
 
 #include "world_type.h"
 #include <string>
@@ -42,8 +42,9 @@ void initialize_species(world_t &w);
 void initialize_world(world_t &w, char *filename, species_t *species);
 //EFFECT: initialize all the attributes of world_t "w"
 
-void read_file_species(string *list, string filename);
+int read_file_species(string *list, string filename);
 //EFFECT: read from the file "filename", store the raw data in the array of string "list"
+//EFFECT: return the species numbers on the file species.
 
 string *read_raw_instruction(string dir, string name);
 //EFFECT: read and store all the raw data of instruction for one species in the species-named file.
@@ -53,7 +54,7 @@ struct instruction_t readable_instruct(string raw);
 //EFFECT: translate the raw data of instruction into structure instruction_t
 //EFFRCT: return instruction_t interpretation of the instruction.
 
-struct species_t *all_species(string *sp_list);
+struct species_t *all_species(string *sp_list, int sp_nums);
 //EFFECT: read instructions from all the creature files, collect all the instructions for one species, then collect all the species
 //EFFECT: return the list of all species with all their instructions loaded
 

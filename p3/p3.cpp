@@ -1,6 +1,5 @@
 #include "simulation.h"
 #include "world_type.h"
-#include <cassert>
 #include <iostream>
 #include <string>
 int main(int argc, char **argv)
@@ -30,8 +29,8 @@ int main(int argc, char **argv)
         std::string dir_species[MAXSPECIES + 1];
         struct world_t world;
 
-        read_file_species(dir_species, argv[1]);
-        species_t *species = all_species(dir_species);
+        int sp_nums = read_file_species(dir_species, argv[1]);
+        species_t *species = all_species(dir_species, sp_nums);
 
         initialize_world(world, argv[2], species);
 

@@ -185,6 +185,7 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 			break;
 		if (creature_num >= MAXCREATURES)
 		{
+			file.close();
 			throw worldError(7, 0);
 		}
 
@@ -204,6 +205,7 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 		}
 		if (!flag)
 		{
+			file.close();
 			throw worldError(8, argv[0]);
 		}
 		//direction setting
@@ -216,6 +218,7 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 			}
 			if (i == 3)
 			{
+				file.close();
 				throw worldError(9, argv[1]);
 			}
 		}
@@ -226,6 +229,7 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 		{
 			string err[4] = {argv[0], argv[1], argv[2], argv[3]};
 			int erri[2] = {h, w};
+			file.close();
 			throw worldError(12, erri, 2, err, 4);
 		}
 		for (unsigned int i = 0; i < creature_num; i++)
@@ -233,6 +237,7 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 			if (c[i].location.r == c[creature_num].location.r && c[i].location.c == c[creature_num].location.c)
 			{
 				creature_t *err[2] = {c + creature_num, c + i};
+				file.close();
 				throw worldError(13, 2, err);
 			}
 		}
@@ -244,19 +249,21 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 	return creature_num;
 }
 
-void initialize_grid(grid_t &g, ifstream &file) // ok on base that file is valid
+void initialize_grid(grid_t &g, ifstream &file)
 {
 	string tmp;
 	getline(file, tmp);
 	g.height = stoi(tmp);
 	if (g.height > MAXHEIGHT || g.height < 1)
 	{
+		file.close();
 		throw worldError(10, 0);
 	}
 	getline(file, tmp);
 	g.width = stoi(tmp);
 	if (g.width > MAXWIDTH || g.width < 1)
 	{
+		file.close();
 		throw worldError(11, 0);
 	}
 
@@ -309,22 +316,27 @@ void initialize_world(world_t &w, char *filename, species_t *species)
 	file.close();
 }
 
-void read_file_species(string *list, string filename)
+int read_file_species(string *list, string filename)
 {
 	ifstream file(filename);
 	if (file.is_open())
 	{
 		int i = 0;
-		while (file)
+		string sp_tmp;
+		while (getline(file, sp_tmp))
 		{
-			if (i - 1 > int(MAXSPECIES))
+			if (sp_tmp.empty())
+				break;
+			if (i > int(MAXSPECIES))
 			{
+				file.close();
 				throw worldError(4, 0);
 			}
-			getline(file, list[i]);
+			list[i] = sp_tmp;
 			i++;
 		}
 		file.close();
+		return i - 1;
 	}
 	else
 	{
@@ -340,16 +352,19 @@ string *read_raw_instruction(string dir, string name)
 	int itr = 0;
 	if (file.is_open())
 	{
-		while (file)
+		string ins_tmp;
+		while (getline(file, ins_tmp)) //IGNORE COMMENTS BELOW
 		{
-			if (itr > int(MAXPROGRAM))
+			if (ins_tmp.empty())
 			{
+				break;
+			}
+			if (itr >= int(MAXPROGRAM))
+			{
+				file.close();
 				throw worldError(5, name);
 			}
-			getline(file, res[itr]);
-			//IGNORE COMMENTS BELOW
-			if (res[itr].empty())
-				break;
+			res[itr] = ins_tmp;
 			itr++;
 		}
 		file.close();
@@ -357,8 +372,8 @@ string *read_raw_instruction(string dir, string name)
 	else
 	{
 		string err[2] = {dir, name};
+		file.close();
 		throw worldError(-3, err, 2);
-		exit(0);
 	}
 	return res;
 }
@@ -393,11 +408,11 @@ struct instruction_t readable_instruct(string raw)
 	return res;
 }
 
-struct species_t *all_species(string *sp_list)
+struct species_t *all_species(string *sp_list, int sp_nums)
 {
 	species_t *s = new species_t[MAXSPECIES];
 	int current_sp = 0;
-	while (!sp_list[current_sp + 1].empty())
+	while (current_sp + 1 <= sp_nums)
 	{
 		s[current_sp].name = sp_list[current_sp + 1];
 		string *res = read_raw_instruction(sp_list[0], sp_list[current_sp + 1]);
