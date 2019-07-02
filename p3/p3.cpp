@@ -28,12 +28,12 @@ int main(int argc, char **argv)
 
         std::string dir_species[MAXSPECIES + 1];
         struct world_t world;
-
+        //inintialize list of species
         int sp_nums = read_file_species(dir_species, argv[1]);
         species_t *species = all_species(dir_species, sp_nums);
-
-        initialize_world(world, argv[2], species);
-
+        //create the world
+        initialize_world(world, argv[2], species, sp_nums);
+        //run simulation
         take_round(world, round, verbose);
     }
     catch (worldError &e)

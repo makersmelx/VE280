@@ -62,12 +62,12 @@ void worldError::printError()
 	case 1:
 	{
 		cout << "Error: Missing arguments!" << endl;
-		cout << "Usage: ./p3 <specices-summary> <world-file> <rounds> [v|verbose]" << endl;
+		cout << "Usage: ./p3 <species-summary> <world-file> <rounds> [v|verbose]" << endl;
 		break;
 	}
 	case 2:
 	{
-		std::cout << "Error: Number of Simulation rounds is negative!" << endl;
+		std::cout << "Error: Number of simulation rounds is negative!" << endl;
 		break;
 	}
 	case 3:
@@ -102,7 +102,7 @@ void worldError::printError()
 	case 7:
 	{
 		cout << "Error: Too many creatures!" << endl;
-		cout << "Maximal number of creatures is " << MAXCREATURES << endl;
+		cout << "Maximal number of creatures is " << MAXCREATURES << "." << endl;
 		break;
 	}
 	case 8:
@@ -147,7 +147,7 @@ void worldError::printError()
 }
 
 void split(string &str,
-		   string *res, string &pattern)
+		   string *res, const string &pattern)
 {
 	string::size_type pos;
 	str += pattern;
@@ -169,7 +169,7 @@ void split(string &str,
 	}
 }
 
-unsigned int initialize_creature(world_t &world, ifstream &file, species_t *speciesList)
+unsigned int initialize_creature(world_t &world, ifstream &file, species_t *speciesList, const int &sp_nums)
 {
 	unsigned int creature_num = 0;
 	creature_t *c = world.creatures;
@@ -178,9 +178,8 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 	string creature_tmp;
 	string argv[50];
 	string pattern = " ";
-	while (file)
+	while (getline(file, creature_tmp))
 	{
-		getline(file, creature_tmp);
 		if (creature_tmp.empty())
 			break;
 		if (creature_num >= MAXCREATURES)
@@ -193,7 +192,7 @@ unsigned int initialize_creature(world_t &world, ifstream &file, species_t *spec
 		//define the species of the current creature
 		int index = 0;
 		bool flag = false;
-		while (!speciesList[index].name.empty())
+		while (index < sp_nums)
 		{
 			if (speciesList[index].name == argv[0])
 			{
@@ -302,7 +301,7 @@ void initialize_species(world_t &w)
 	}
 }
 
-void initialize_world(world_t &w, char *filename, species_t *species)
+void initialize_world(world_t &w, char *filename, species_t *species, const int &sp_nums)
 {
 	//*****************************
 	ifstream file(filename);
@@ -311,12 +310,12 @@ void initialize_world(world_t &w, char *filename, species_t *species)
 		throw worldError(3, filename);
 	}
 	initialize_grid((w.grid), file);
-	w.numCreatures = initialize_creature(w, file, species);
+	w.numCreatures = initialize_creature(w, file, species, sp_nums);
 	initialize_species(w);
 	file.close();
 }
 
-int read_file_species(string *list, string filename)
+int read_file_species(string *list, const string filename)
 {
 	ifstream file(filename);
 	if (file.is_open())
@@ -344,7 +343,7 @@ int read_file_species(string *list, string filename)
 	}
 }
 
-string *read_raw_instruction(string dir, string name)
+string *read_raw_instruction(const string dir, const string name)
 {
 	string *res = new string[MAXPROGRAM];
 	string path = "./" + dir + "/" + name;
@@ -378,7 +377,7 @@ string *read_raw_instruction(string dir, string name)
 	return res;
 }
 
-struct instruction_t readable_instruct(string raw)
+struct instruction_t readable_instruct(const string raw)
 {
 	struct instruction_t res;
 	istringstream is;
@@ -408,7 +407,7 @@ struct instruction_t readable_instruct(string raw)
 	return res;
 }
 
-struct species_t *all_species(string *sp_list, int sp_nums)
+struct species_t *all_species(string *sp_list, const int &sp_nums)
 {
 	species_t *s = new species_t[MAXSPECIES];
 	int current_sp = 0;
