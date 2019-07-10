@@ -17,7 +17,7 @@ int main(int argc, char **argv)
         {
             throw worldError(2, 0);
         }
-
+        //Determine verbose mode
         bool verbose = false;
         if (argc == 5)
         {
@@ -36,6 +36,7 @@ int main(int argc, char **argv)
         //run simulation
         take_round(world, round, verbose);
     }
+    //Exception handle
     catch (worldError &e)
     {
         e.printError();

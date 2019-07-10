@@ -95,6 +95,7 @@ void print_world(world_t &w);
 //EFFECT: print the m*n world with creature information during each round
 
 void take_round(world_t &w, int roundleft, bool verb);
-// EFFECT: simulation the world in one round. The input is the world_t, the number of rounds (user input), whether in verbose mode(user input)
+// EFFECT: simulation the world with "roundleft" rounds. The input is the world_t, the number of rounds (user input), whether in verbose mode(user input)
+//MODIFY:"w"
 
 #endif
