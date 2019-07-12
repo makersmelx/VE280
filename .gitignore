@@ -45,3 +45,6 @@ p4/p4
 p2/treeins_test.cpp
 p2/simple_test.cpp
 p2/Makefile
+p4/DEBUG
+p4/jy
+p4/result/jy

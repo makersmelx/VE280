@@ -14,7 +14,7 @@ public:
         {
             try
             {
-                cout << "Enter a piece:" << endl;
+                cout << "Enter a piece:";
                 cin >> input;
                 if (input.length() != 4)
                 {
@@ -52,13 +52,14 @@ public:
 
     Square &selectSquare(const Piece &p)
     {
+
         string input;
-        int _v, _h;
+        int _v = 0, _h = 0;
         while (true)
         {
             try
             {
-                cout << "Enter a position:" << endl;
+                cout << "Enter a position:";
                 cin >> input;
                 if (input.length() != 2)
                 {
@@ -118,7 +119,7 @@ public:
 
     Piece &selectPiece()
     {
-        srand(rand_seed);
+        // srand(rand_seed);
         int index;
         int good_array[NP];
         int good_currentLength = 0;
@@ -158,13 +159,14 @@ public:
                 good_array[good_currentLength++] = i;
             }
         }
-        index = good_currentLength == 0 ? rand() % currentLength : rand() % good_currentLength;
-        return pool->getUnusedPiece(Height(array[index] / 8), Color((index / 4) % 2), Shape((array[index] / 2) % 2), Top(array[index] % 2));
+        index = (good_currentLength == 0) ? rand() % currentLength : rand() % good_currentLength;
+        int res_index = (good_currentLength == 0) ? array[index] : good_array[index];
+        return pool->getUnusedPiece(Height(res_index / 8), Color((res_index / 4) % 2), Shape((res_index / 2) % 2), Top(res_index % 2));
     }
 
     Square &selectSquare(const Piece &p)
     {
-        srand(rand_seed);
+        // srand(rand_seed);
         int array[NP];
         int currentLength = 0;
         for (int j = 0; j < NP; j++)
@@ -191,12 +193,14 @@ public:
 
 extern Player *getHumanPlayer(Board *b, Pool *p)
 {
+
     Player *_p = new HumanPlayer(b, p);
     return _p;
 }
 
 extern Player *getMyopicPlayer(Board *b, Pool *p, unsigned int s)
 {
+    srand(s);
     Player *_p = new MyopicPlayer(b, p, s);
     return _p;
 }

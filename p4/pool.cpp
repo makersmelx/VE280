@@ -54,5 +54,5 @@ std::string Pool::toString() const
         second.pop_back();
         res = "Available:\n" + first + "\n" + second;
     }
-    return res;
+    return res + "\n";
 }

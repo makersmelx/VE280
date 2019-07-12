@@ -1,6 +1,8 @@
 #include "board.h"
+#include <iostream>
 Board::Board()
 {
+
     for (int i = 0; i < NP; i++)
     {
         grid[i / 4][i % 4] = Square(Vaxis(i / 4), Haxis(i % 4));
@@ -47,6 +49,7 @@ Square &Board::getEmptySquare(const std::string &s)
 
 void Board::place(Piece &p, Square &sq)
 {
+
     Piece *q = &p;
     p.setUsed(true);
     sq.setPiece(q);
@@ -57,66 +60,27 @@ bool Board::isWinning(const Piece &p, const Square &sq)
     bool win = false, empty = false;
     Vaxis v = sq.getV();
     Haxis h = sq.getH();
-    Piece tar;
-    if (grid[int(v)][int(h)].isEmpty())
+    // Piece tar;
+    // if (grid[int(v)][int(h)].isEmpty())
+    // {
+    //     tar = p;
+    // }
+    // else
+    // {
+    //     tar = grid[int(v)][int(h)].getPiece();
+    // }
+
+    for (int mode = 0; mode < 4; mode++)
     {
-        tar = p;
-    }
-    else
-    {
-        tar = grid[int(v)][int(h)].getPiece();
-    }
-    for (int i = 0; i < 4; i++)
-    {
-        if (grid[int(v)][i].isEmpty() && i != int(h))
-        {
-            empty = true;
+        int test[4] = {int(h), int(v), int(v), int(v)};
+        if (mode == 2 && !sq.isOnFirstDiagonal())
+            continue;
+        if (mode == 3 && !sq.isOnSecondDiagonal())
             break;
-        }
-    }
-    if (!empty)
-    {
-        bool comp[4] = {1, 1, 1, 1};
-        for (int i = 0; i < 4 && i != int(h); i++)
-        {
-            comp[0] = comp[0] && (grid[int(v)][i].getPiece().compareHeight(tar));
-            comp[1] = comp[1] && (grid[int(v)][i].getPiece().compareColor(tar));
-            comp[2] = comp[2] && (grid[int(v)][i].getPiece().compareShape(tar));
-            comp[0] = comp[3] && (grid[int(v)][i].getPiece().compareTop(tar));
-        }
-        win = comp[0] || comp[1] || comp[2] || comp[3];
-    }
-    if (win)
-        return true;
-    empty = false;
-    for (int i = 0; i < 4; i++)
-    {
-        if (grid[i][int(h)].isEmpty() && i != int(v))
-        {
-            empty = true;
-            break;
-        }
-    }
-    if (!empty)
-    {
-        bool comp[4] = {1, 1, 1, 1};
-        for (int i = 0; i < 4 && i != int(v); i++)
-        {
-            comp[0] = comp[0] && (grid[i][int(h)].getPiece().compareHeight(tar));
-            comp[1] = comp[1] && (grid[i][int(h)].getPiece().compareColor(tar));
-            comp[2] = comp[2] && (grid[i][int(h)].getPiece().compareShape(tar));
-            comp[0] = comp[3] && (grid[i][int(h)].getPiece().compareTop(tar));
-        }
-        win = comp[0] || comp[1] || comp[2] || comp[3];
-    }
-    if (win)
-        return true;
-    empty = false;
-    if (sq.isOnFirstDiagonal())
-    {
         for (int i = 0; i < 4; i++)
         {
-            if (grid[i][i].isEmpty() && i != int(v))
+            int test_arg[4][2] = {{int(v), i}, {i, int(h)}, {i, i}, {i, 3 - i}};
+            if (grid[test_arg[mode][0]][test_arg[mode][1]].isEmpty() && i != test[mode])
             {
                 empty = true;
                 break;
@@ -124,42 +88,24 @@ bool Board::isWinning(const Piece &p, const Square &sq)
         }
         if (!empty)
         {
-            bool comp[4] = {1, 1, 1, 1};
-            for (int i = 0; i < 4 && i != int(v); i++)
+            int comp[4] = {0, 0, 0, 0};
+            for (int i = 0; i < 4; i++)
             {
-                comp[0] = comp[0] && (grid[i][i].getPiece().compareHeight(tar));
-                comp[1] = comp[1] && (grid[i][i].getPiece().compareColor(tar));
-                comp[2] = comp[2] && (grid[i][i].getPiece().compareShape(tar));
-                comp[0] = comp[3] && (grid[i][i].getPiece().compareTop(tar));
+                if (i == test[mode])
+                    continue;
+                int arg[4][2] = {{int(v), i}, {i, int(h)}, {i, i}, {i, 3 - i}};
+                const Piece &cur = grid[arg[mode][0]][arg[mode][1]].getPiece();
+                comp[0] = comp[0] + int(p.compareHeight(cur));
+                comp[1] = comp[1] + int(p.compareColor(cur));
+                comp[2] = comp[2] + int(p.compareShape(cur));
+                comp[3] = comp[3] + int(p.compareTop(cur));
             }
-            win = comp[0] || comp[1] || comp[2] || comp[3];
+            win = ((comp[0] == 3) || (comp[1] == 3) || (comp[2] == 3) || (comp[3] == 3));
         }
-    }
-    if (win)
-        return true;
-    empty = false;
-    if (sq.isOnSecondDiagonal())
-    {
-        for (int i = 0; i < 4; i++)
-        {
-            if (grid[i][3 - i].isEmpty() && i != int(v))
-            {
-                empty = true;
-                break;
-            }
-        }
-        if (!empty)
-        {
-            bool comp[4] = {1, 1, 1, 1};
-            for (int i = 0; i < 4 && i != int(v); i++)
-            {
-                comp[0] = comp[0] && (grid[i][3 - i].getPiece().compareHeight(tar));
-                comp[1] = comp[1] && (grid[i][3 - i].getPiece().compareColor(tar));
-                comp[2] = comp[2] && (grid[i][3 - i].getPiece().compareShape(tar));
-                comp[0] = comp[3] && (grid[i][3 - i].getPiece().compareTop(tar));
-            }
-            win = comp[0] || comp[1] || comp[2] || comp[3];
-        }
+        if (win)
+            break;
+        empty = false;
+        // std::cout << mode << win << std::endl;
     }
     return win;
 }
@@ -167,7 +113,7 @@ bool Board::isWinning(const Piece &p, const Square &sq)
 std::string Board::toString() const
 {
     std::string res;
-    res += "    1    2    3    4   \n";
+    res += "    1    2    3    4\n";
     res += "  +----+----+----+----+\n";
     std::string head[4] = {"a ", "b ", "c ", "d "};
     for (int j = 0; j < 4; j++)
