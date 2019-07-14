@@ -52,3 +52,4 @@ p4/sh_test/hh
 p4/sh_test/hm
 p4/sh_test/*_result
 *.o
+p4/sh_test/others
