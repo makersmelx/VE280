@@ -12,7 +12,7 @@ done
 
 for file in $(ls ../$4); do
     to_save="${file}_hm_res"
-    ../$2 h m ${file} <../$4/${file} >./${to_save}
+    ../$2 h m ${file} <../$4/${file} >${to_save}
 done
 
 int=-114514
