@@ -48,3 +48,7 @@ p2/Makefile
 p4/DEBUG
 p4/jy
 p4/result/jy
+p4/sh_test/hh
+p4/sh_test/hm
+p4/sh_test/*_result
+*.o
