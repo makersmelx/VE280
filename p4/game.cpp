@@ -33,7 +33,6 @@ int main(int argc, char **argv)
     cout << game_pool->toString() << endl;
     while (!game_end)
     {
-        //换行符我估计哪里有问题
         cout << "Player " << (turn_mark + 1) / 2 + 1 << "'s turn to select a piece:" << endl;
         Piece &selected_piece = p[(turn_mark + 1) / 2]->selectPiece();
         selected_piece.setUsed(true);
@@ -57,9 +56,9 @@ int main(int argc, char **argv)
             cout << "It is a draw." << endl;
             game_end = true;
         }
-        //turn_mark *= -1;
     }
     delete game_board;
     delete game_pool;
+
     return 0;
 }

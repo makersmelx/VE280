@@ -6,6 +6,12 @@ class HumanPlayer : public Player
 {
 public:
     HumanPlayer(Board *board, Pool *pool) : Player(board, pool) {}
+    void set(Board *b,Pool *p)
+    {
+        board = b;
+        pool = p;
+        
+    }
     Piece &selectPiece()
     {
         string input;
@@ -117,6 +123,13 @@ public:
         rand_seed = _seed;
     }
 
+    void set(Board *b,Pool *p,unsigned int n)
+    {
+        board = b;
+        pool = p;
+        rand_seed = n;
+    }
+
     Piece &selectPiece()
     {
         // srand(rand_seed);
@@ -191,16 +204,18 @@ public:
     }
 };
 
+static HumanPlayer _h(nullptr, nullptr);
+static MyopicPlayer _m(nullptr, nullptr, 0);
+
 extern Player *getHumanPlayer(Board *b, Pool *p)
 {
-
-    Player *_p = new HumanPlayer(b, p);
-    return _p;
+    _h.set(b, p);
+    return &_h;
 }
 
 extern Player *getMyopicPlayer(Board *b, Pool *p, unsigned int s)
 {
     srand(s);
-    Player *_p = new MyopicPlayer(b, p, s);
-    return _p;
+    _m.set(b, p, s);
+    return &_m;
 }
