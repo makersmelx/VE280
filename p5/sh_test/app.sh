@@ -1,9 +1,33 @@
 # Usage:
-#       ./app.sh gcall <arg2> <arg3> generate cases
-#       ./app.sh c  clear all the cases and diff file
-#       ./app.sh r <name> <call dir> <calc dir>
+#       ./app.sh gcall <range_start> <add each time ><range_end> generate cases
+#       ./app.sh c  clear all the cases and diff_detail file
+#       ./app.sh r <name> <executable call dir> <executable calc dir>
 #       ./app.sh d <name2> <name3>
-#       ./app.sh gcalc <arg2> <RPN cpp source> <expression raw>  arg2 must be consistent with the first line of the raw file of expression
+#       ./app.sh gcalc <num of expressions> <RPN cpp source> <expression raw> 
+
+if [ "$1" = "h" ]; then
+    echo "Help:
+    Generate call cases
+        ./app.sh gcall <range_start> <add each time> <range_end> 
+
+    Generate calc cases  
+        ./app.sh gcalc <num of expressions> <RPN cpp source> <expression raw>
+    
+    Clear all the compare files
+        ./app.sh c  
+    
+    Run and set results
+        ./app.sh r <name> <executable call dir> <executable calc dir>
+
+    Run and set calc results only
+        ./app.sh rcalc <name> <executable call dir> <executable calc dir>
+
+    Run and set call results only
+        ./app.sh rcall <name> <executable call dir> <executable calc dir>
+
+    Compare two users' results
+        ./app.sh d <name2> <name3>"
+fi
 
 if [ "$1" = "c" ]; then
     rm -r cases
@@ -86,28 +110,29 @@ if [ "$1" = "d" ]; then
     echo "Calc: $2 result comparison with standard begin!"
     for file in $(ls calc_in);do
         result=$(diff $2_result/${file}_calc calc_stdOut/stdAns_${file} -q)
-        if [ "$result" = "File $2_result/${file}_calc and calc_stdOut/stdAns_${file} differ" ]; then
+        if [ "$result" = "Files $2_result/${file}_calc and calc_stdOut/stdAns_${file} differ" ]; then
             echo $result
             cd diff_detail
-            diff $2_result/${file}_calc calc_stdOut/stdAns_${file} -y >${file}
+            diff ../$2_result/${file}_calc ../calc_stdOut/stdAns_${file} -y >${file}
             cd ../
         fi
     done
     echo "Calc: $3 result comparison with standard begin!"
     for file in $(ls calc_in);do
         result=$(diff $3_result/${file}_calc calc_stdOut/stdAns_${file} -q)
-        if [ "$result" = "File $3_result/${file}_calc and calc_stdOut/stdAns_${file} differ" ]; then
+        if [ "$result" = "Files $3_result/${file}_calc and calc_stdOut/stdAns_${file} differ" ]; then
             echo $result
             cd diff_detail
-            diff $3_result/${file}_calc calc_stdOut/stdAns_${file} -y >${file}
+            diff ../$3_result/${file}_calc ../calc_stdOut/stdAns_${file} -y >${file}
             cd ../
         fi
     done
     echo "Call: $2 and $3 result comparison begin!"
     cd $2_result
-    for file in ./*call;do
+    for file in *call;do
         result=$(diff ${file} ../$3_result/${file} -q)
-        if [ "$result" = "File $file and ../$3_result/${file} differ" ]; then
+        
+        if [ "$result" = "Files $file and ../$3_result/${file} differ" ]; then
             echo $result
             cd ../diff_detail
             diff ../$2_result/${file} ../$3_result/${file} -y >${file}

@@ -50,6 +50,7 @@ int main(int argc, char **argv)
         {
             cout << "Player " << (turn_mark + 1) / 2 + 1 << " has won!" << endl;
             game_end = true;
+            break;
         }
         if (game_pool->toString().empty())
         {
