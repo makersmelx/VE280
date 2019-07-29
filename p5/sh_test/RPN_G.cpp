@@ -47,7 +47,8 @@ int main(int argc, char **argv)
                     string ofileName = argv[2];
                     ofileName = ofileName + "/stdAns_" + file_index;
                     ofstream ofile(ofileName);
-                    ofile << expression.substr(i + 1);
+                    ofile << expression.substr(i + 1) << endl;
+                    ofile.close();
                     //cout << expression.substr(i + 1);
                     break;
                 }

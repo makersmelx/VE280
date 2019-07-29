@@ -106,6 +106,7 @@ if [ "$1" = "gcalc" ]; then
 fi
 
 if [ "$1" = "d" ]; then
+    rm -r diff_detail
     mkdir diff_detail
     echo "Calc: $2 result comparison with standard begin!"
     for file in $(ls calc_in);do
@@ -113,7 +114,7 @@ if [ "$1" = "d" ]; then
         if [ "$result" = "Files $2_result/${file}_calc and calc_stdOut/stdAns_${file} differ" ]; then
             echo $result
             cd diff_detail
-            diff ../$2_result/${file}_calc ../calc_stdOut/stdAns_${file} -y >${file}
+            diff ../$2_result/${file}_calc ../calc_stdOut/stdAns_${file} -y >"$2_${file}"
             cd ../
         fi
     done
@@ -123,7 +124,7 @@ if [ "$1" = "d" ]; then
         if [ "$result" = "Files $3_result/${file}_calc and calc_stdOut/stdAns_${file} differ" ]; then
             echo $result
             cd diff_detail
-            diff ../$3_result/${file}_calc ../calc_stdOut/stdAns_${file} -y >${file}
+            diff ../$3_result/${file}_calc ../calc_stdOut/stdAns_${file} -y >"$3_${file}"
             cd ../
         fi
     done
