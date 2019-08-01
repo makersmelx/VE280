@@ -132,7 +132,8 @@ private:
 
 int main()
 {
-    CallCenter sq;
-    sq.init();
-    sq.loop();
+    CallCenter sqCall;
+    sqCall.init();
+    sqCall.loop();
+    return 0;
 }

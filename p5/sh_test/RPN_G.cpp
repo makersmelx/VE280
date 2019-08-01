@@ -6,8 +6,17 @@
 using namespace std;
 //agrv1 存输入的文件夹
 //argv2 存标准答案的文件夹
+//argv3 混乱选项
 int main(int argc, char **argv)
 {
+    if(argc ==4 )
+    {
+        string res = "-1 -2 + a -1 / a q";
+        //string res = "123.456\n12,45\n,,45\n546\np\na\n+\np\na\n-\np\na\n*\np\na\n/\np\na\nc\np\na\nn\nd\nr\n+\n-\n*\n/\n0\n12\nc\n0\nr\n12\np\na\nr\na\n/\nc\n0\n0\n/\nq";
+        cout << res;
+        return 0;
+    }
+
     int n = 0;
     cin >> n;
     for (int itr = 0; itr < n; itr++)

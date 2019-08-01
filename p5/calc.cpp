@@ -27,13 +27,8 @@ private:
     string cur_input;
 
 public:
-    RPN_calc() 
-    {
-    }
-    ~RPN_calc() 
-    {
-        
-    }
+    RPN_calc() {}
+    ~RPN_calc() {}
 
     void loop()
     {
@@ -59,9 +54,15 @@ private:
     void decideMode()
     {
         cin >> cur_input;
+        //getline(cin, cur_input);
         if (cur_input.size() > 1)
         {
-            for (int i = 0; i < cur_input.size(); i++)
+            int loopStart = 0;
+            if(cur_input[0]=='-')
+            {
+                loopStart = 1;
+            }
+            for (int i = loopStart; i < cur_input.size(); i++)
             {
                 if (cur_input[i] - '0' < 0 || cur_input[i] - '0' > 9)
                 {
@@ -97,8 +98,7 @@ private:
         {
         case operand:
         {
-            int _tmp = stoi(cur_input);
-            int *tmp = new int(_tmp);
+            int *tmp = new int(stoi(cur_input));
             stk.insertFront(tmp);
             break;
         }
@@ -133,9 +133,8 @@ private:
         case reverse:
         {
             operandsJudge(2);
-            int *num1, *num2;
-            num1 = stk.removeFront();
-            num2 = stk.removeFront();
+            int *num1 = stk.removeFront();
+            int *num2 = stk.removeFront();
             stk.insertFront(num1);
             stk.insertFront(num2);
             break;
@@ -152,8 +151,8 @@ private:
             while (!stk.isEmpty())
             {
                 delTmp = stk.removeFront();
+                delete delTmp;
             }
-            delete delTmp;
             break;
         }
         default:
@@ -161,29 +160,26 @@ private:
         }
     }
 
-    void operandsJudge(int nums)
+    void operandsJudge(int nums) const
     {
         Dlist<int> test(stk);
-        int *delTmp;
         for (int i = 0; i < nums; i++)
         {
             if (test.isEmpty())
             {
-                delete delTmp;
                 throw - 2;
             }
-            delTmp = test.removeFront();
+            int *delTmp = test.removeFront();
             delete delTmp;
         }
     }
 
     void binaryOp(token op)
     {
-        int *res = new int;
-        int *num1, *num2;
         operandsJudge(2);
-        num2 = stk.removeFront();
-        num1 = stk.removeFront();
+        int *res = new int;
+        int *num2 = stk.removeFront();
+        int *num1 = stk.removeFront();
         switch (op)
         {
         case plus:
@@ -238,16 +234,10 @@ private:
         }
         else
         {
-            if (!tmp.isEmpty())
-            {
-                printTmp = tmp.removeFront();
-                cout << *printTmp;
-                delete printTmp;
-            }
             while (!tmp.isEmpty())
             {
                 printTmp = tmp.removeFront();
-                cout << " " << *printTmp;
+                cout << *printTmp << " ";
                 delete printTmp;
             }
             cout << endl;
@@ -276,7 +266,7 @@ private:
 
 int main()
 {
-    RPN_calc zzz;
-    zzz.loop();
+    RPN_calc zzzCalc;
+    zzzCalc.loop();
     return 0;
 }
