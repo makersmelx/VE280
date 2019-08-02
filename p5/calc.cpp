@@ -58,7 +58,7 @@ private:
         if (cur_input.size() > 1)
         {
             int loopStart = 0;
-            if(cur_input[0]=='-')
+            if (cur_input[0] == '-')
             {
                 loopStart = 1;
             }
@@ -107,6 +107,7 @@ private:
         case times:
         case divide:
         {
+            operandsJudge(2);
             binaryOp(op);
             break;
         }
@@ -176,7 +177,6 @@ private:
 
     void binaryOp(token op)
     {
-        operandsJudge(2);
         int *res = new int;
         int *num2 = stk.removeFront();
         int *num1 = stk.removeFront();
@@ -223,17 +223,18 @@ private:
 
     void printStk(token op)
     {
-        int *printTmp;
         Dlist<int> tmp(stk);
         if (op == print)
         {
             operandsJudge(1);
+            int *printTmp;
             printTmp = tmp.removeFront();
             cout << *printTmp << endl;
             delete printTmp;
         }
         else
         {
+            int *printTmp;
             while (!tmp.isEmpty())
             {
                 printTmp = tmp.removeFront();
@@ -242,7 +243,6 @@ private:
             }
             cout << endl;
         }
-        
     }
 
     void errorMsg(int mode)
