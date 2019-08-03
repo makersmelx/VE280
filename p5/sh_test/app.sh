@@ -7,10 +7,10 @@
 
 if [ "$1" = "h" ]; then
     echo "Help:
-    Generate call cases
+    Generate call cases (no need if directory call_cases exists)
         ./app.sh gcall <range_start> <add each time> <range_end> 
 
-    Generate calc cases  
+    Generate calc cases (no need if directory calc_in/calc_stdOut exists)
         ./app.sh gcalc <num of expressions> <RPN cpp source> <expression raw>
     
     Clear all the compare files
@@ -18,15 +18,19 @@ if [ "$1" = "h" ]; then
     
     Run and set results
         ./app.sh r <name> <executable call dir> <executable calc dir>
+        exp: ./app.sh jy ../call ../calc
 
     Run and set calc results only
         ./app.sh rcalc <name> <executable call dir> <executable calc dir>
+        exp: ./app.sh jy ../call ../calc
 
     Run and set call results only
         ./app.sh rcall <name> <executable call dir> <executable calc dir>
+        exp: ./app.sh jy ../call ../calc
 
     Compare two users' results
-        ./app.sh d <name2> <name3>"
+        ./app.sh d <name2> <name3>
+        exp: ./app.sh d jy yy"
 fi
 
 if [ "$1" = "c" ]; then

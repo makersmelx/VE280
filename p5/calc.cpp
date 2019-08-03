@@ -20,14 +20,18 @@ private:
         print,
         clear,
         printAll,
-        quit
+        quit,
+        error
     };
     string op_str[11] = {"+", "-", "*", "/", "n", "d", "r", "p", "c", "a", "q"};
     token op;
     string cur_input;
 
 public:
-    RPN_calc() {}
+    RPN_calc() 
+    {
+        op = error;
+    }
     ~RPN_calc() {}
 
     void loop()
@@ -148,10 +152,10 @@ private:
         }
         case clear:
         {
-            int *delTmp;
+            
             while (!stk.isEmpty())
             {
-                delTmp = stk.removeFront();
+                int *delTmp = stk.removeFront();
                 delete delTmp;
             }
             break;
@@ -227,17 +231,15 @@ private:
         if (op == print)
         {
             operandsJudge(1);
-            int *printTmp;
-            printTmp = tmp.removeFront();
+            int *printTmp = tmp.removeFront();
             cout << *printTmp << endl;
             delete printTmp;
         }
         else
         {
-            int *printTmp;
             while (!tmp.isEmpty())
             {
-                printTmp = tmp.removeFront();
+                int *printTmp = tmp.removeFront();
                 cout << *printTmp << " ";
                 delete printTmp;
             }
