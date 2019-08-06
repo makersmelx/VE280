@@ -403,7 +403,7 @@ private:
     void doubleSpace()
     {
         T *tmp = elem;
-        elem = new T[maxSize];
+        elem = new T[maxSize*2];
         for (int i = 1; i <= maxSize;i++)
         {
             elem[i] = tmp[(front + i) % maxSize];

@@ -43,6 +43,25 @@ public:
         cout << val + 111 << endl;
     }
 };
+
+
+class A 
+{
+public:
+    virtual void f() 
+    {
+        cout << "A::f()" << endl;
+    }
+};
+class B : public A 
+{
+public:
+    void f() 
+    {
+        cout << "B::f()" << endl;
+    }
+};
+
 class note
 {
     //Subtype: code written for its father should follow substitution principle.
@@ -59,5 +78,12 @@ int main()
     lhs.a();
     bigSpam *ssb = &lhs;
     ssb->a();
+    cout << "-------------------" << endl;
+
+    A a, *pa;
+    B b, *pb;
+    pb = &b;
+    pa = dynamic_cast<A *>(pb);
+    pa->f();
     return 0;
 }
